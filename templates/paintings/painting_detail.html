@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}{{ painting.title }} — ArtVault{% endblock %}
+{% block meta_description %}{{ painting.title }} by {{ painting.artist.name }}, {{ painting.year_created }}. {{ painting.style }}.{% endblock %}
+
+{% block content %}
+
+  <a href="{% url 'paintings:home' %}" class="back-link" id="back-to-collection">
+    ← Back to Collection
+  </a>
+
+  <div class="detail-layout" id="painting-detail">
+
+    <!-- Image Column -->
+    <div class="detail-image-col">
+      {% if painting.image %}
+        <div class="gold-frame">
+          <img src="{{ painting.image.url }}"
+               alt="{{ painting.title }}"
+               id="painting-main-image" />
+        </div>
+      {% else %}
+        <div class="gold-frame" style="width:100%; display:flex; align-items:center; justify-content:center; background:var(--cream-deeper); min-height:380px;">
+          <div style="text-align:center; color:var(--muted);">
+            <svg width="80" height="80" viewBox="0 0 80 80" fill="none" style="margin:0 auto 1rem; opacity:0.4;">
+              <rect x="8" y="8" width="64" height="64" rx="3" stroke="#B8862E" stroke-width="2.5"/>
+              <rect x="18" y="18" width="44" height="44" rx="2" stroke="#B8862E" stroke-width="1.5" stroke-dasharray="4 3"/>
+              <circle cx="40" cy="34" r="8" stroke="#B8862E" stroke-width="2"/>
+              <path d="M14 60 Q26 44 40 48 Q54 52 66 60" stroke="#B8862E" stroke-width="2" fill="none"/>
+            </svg>
+            <p style="font-size:0.85rem; letter-spacing:0.06em; text-transform:uppercase;">No image uploaded</p>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Info Column -->
+    <div class="detail-info">
+
+      <span class="card-style-badge" style="margin-bottom:0.75rem;">{{ painting.style }}</span>
+
+      <h1 id="painting-title">{{ painting.title }}</h1>
+
+      <a href="{% url 'artists:detail' painting.artist.pk %}"
+         class="detail-artist-link"
+         id="artist-link">
+        {{ painting.artist.name }}
+      </a>
+
+      <!-- Meta grid -->
+      <div class="detail-meta-grid" id="painting-meta">
+
+        <div class="meta-item">
+          <label>Year</label>
+          <span class="meta-value">{{ painting.year_created }}</span>
+        </div>
+
+        <div class="meta-item">
+          <label>Style</label>
+          <span class="meta-value">{{ painting.style }}</span>
+        </div>
+
+        {% if painting.materials %}
+        <div class="meta-item">
+          <label>Materials</label>
+          <span class="meta-value">{{ painting.materials }}</span>
+        </div>
+        {% endif %}
+
+        {% if painting.dimensions %}
+        <div class="meta-item">
+          <label>Dimensions</label>
+          <span class="meta-value">{{ painting.dimensions }}</span>
+        </div>
+        {% endif %}
+
+        {% if painting.current_location %}
+        <div class="meta-item" style="grid-column: 1 / -1;">
+          <label>Current Location</label>
+          <span class="meta-value">{{ painting.current_location }}</span>
+        </div>
+        {% endif %}
+
+        {% if painting.estimated_value %}
+        <div class="meta-item" style="grid-column: 1 / -1;">
+          <label>Estimated Value</label>
+          <span class="meta-value value-highlight" id="estimated-value">
+            ${{ painting.estimated_value|floatformat:"2" }}
+          </span>
+        </div>
+        {% endif %}
+
+      </div>
+
+      <!-- Story -->
+      {% if painting.story %}
+        <hr class="detail-divider" />
+        <div class="detail-story" id="painting-story">
+          <h2>The Story Behind the Work</h2>
+          <p>{{ painting.story }}</p>
+        </div>
+      {% endif %}
+
+    </div>
+  </div>
+
+{% endblock %}

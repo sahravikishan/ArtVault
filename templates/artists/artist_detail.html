@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}{{ artist.name }} — ArtVault{% endblock %}
+{% block meta_description %}{{ artist.name }}{% if artist.birth_year %}, born {{ artist.birth_year }}{% endif %}. Browse all paintings in the ArtVault collection.{% endblock %}
+
+{% block content %}
+
+  <a href="{% url 'paintings:home' %}" class="back-link" id="back-to-collection">
+    ← Back to Collection
+  </a>
+
+  <!-- Artist Profile Header -->
+  <div class="artist-profile-header" id="artist-profile">
+
+    <div class="artist-photo-wrap">
+      {% if artist.photo %}
+        <div class="gold-frame">
+          <img src="{{ artist.photo.url }}"
+               alt="Portrait of {{ artist.name }}"
+               id="artist-photo" />
+        </div>
+      {% else %}
+        <div class="artist-photo-placeholder" id="artist-photo-placeholder">
+          {{ artist.name|slice:":1" }}
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="artist-info">
+      <h1 id="artist-name">{{ artist.name }}</h1>
+      {% if artist.birth_year %}
+        <p class="artist-born" id="artist-born">Born {{ artist.birth_year }}</p>
+      {% endif %}
+      {% if artist.bio %}
+        <p class="artist-bio" id="artist-bio">{{ artist.bio }}</p>
+      {% endif %}
+    </div>
+
+  </div>
+
+  <!-- Paintings by This Artist -->
+  <h2 class="section-heading" id="paintings-section">
+    Works in the Vault
+  </h2>
+
+  {% if paintings %}
+    <div class="painting-grid" id="artist-painting-grid">
+      {% for painting in paintings %}
+        <article class="painting-card" id="artist-card-{{ painting.pk }}">
+
+          <a href="{% url 'paintings:detail' painting.pk %}" class="card-image-wrap" tabindex="-1" aria-hidden="true">
+            {% if painting.image %}
+              <img src="{{ painting.image.url }}"
+                   alt="{{ painting.title }}"
+                   loading="lazy" />
+            {% else %}
+              <div class="card-placeholder">
+                <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+                  <rect x="6" y="6" width="36" height="36" rx="2" stroke="#B8862E" stroke-width="2"/>
+                  <rect x="12" y="12" width="24" height="24" rx="1" stroke="#B8862E" stroke-width="1" stroke-dasharray="3 2"/>
+                  <circle cx="24" cy="21" r="4" stroke="#B8862E" stroke-width="1.5"/>
+                  <path d="M11 34 Q17 26 24 28 Q31 30 37 34" stroke="#B8862E" stroke-width="1.5" fill="none"/>
+                </svg>
+                <span>No Image</span>
+              </div>
+            {% endif %}
+          </a>
+
+          <div class="card-body">
+            <span class="card-style-badge">{{ painting.style }}</span>
+            <h3 class="card-title">
+              <a href="{% url 'paintings:detail' painting.pk %}">{{ painting.title }}</a>
+            </h3>
+            <div class="card-meta">
+              <span>{{ painting.year_created }}</span>
+              {% if painting.estimated_value %}
+                <span class="card-value">${{ painting.estimated_value|floatformat:"0" }}</span>
+              {% endif %}
+            </div>
+          </div>
+
+        </article>
+      {% endfor %}
+    </div>
+
+  {% else %}
+    <div class="empty-state" id="no-paintings-state">
+      <h3>No paintings catalogued yet</h3>
+      <p>Add paintings by {{ artist.name }} via the <a href="/admin/">Admin panel</a>.</p>
+    </div>
+  {% endif %}
+
+{% endblock %}
