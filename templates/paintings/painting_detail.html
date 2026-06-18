@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load currency_tags %}
 
 {% block title %}{{ painting.title }} — ArtVault{% endblock %}
 {% block meta_description %}{{ painting.title }} by {{ painting.artist.name }}, {{ painting.year_created }}. {{ painting.style }}.{% endblock %}
@@ -11,33 +12,42 @@
 
   <div class="detail-layout" id="painting-detail">
 
-    <!-- Image Column -->
-    <div class="detail-image-col">
+    <!-- ── Image Column ── -->
+    <div class="detail-image-col gold-frame-full">
       {% if painting.image %}
         <div class="gold-frame">
+          <!-- Animated border segments -->
+          <span class="frame-v-r" aria-hidden="true"></span>
+          <span class="frame-v-l" aria-hidden="true"></span>
+          <span class="frame-inner" aria-hidden="true"></span>
           <img src="{{ painting.image.url }}"
                alt="{{ painting.title }}"
                id="painting-main-image" />
         </div>
       {% else %}
-        <div class="gold-frame" style="width:100%; display:flex; align-items:center; justify-content:center; background:var(--cream-deeper); min-height:380px;">
-          <div style="text-align:center; color:var(--muted);">
-            <svg width="80" height="80" viewBox="0 0 80 80" fill="none" style="margin:0 auto 1rem; opacity:0.4;">
-              <rect x="8" y="8" width="64" height="64" rx="3" stroke="#B8862E" stroke-width="2.5"/>
-              <rect x="18" y="18" width="44" height="44" rx="2" stroke="#B8862E" stroke-width="1.5" stroke-dasharray="4 3"/>
-              <circle cx="40" cy="34" r="8" stroke="#B8862E" stroke-width="2"/>
-              <path d="M14 60 Q26 44 40 48 Q54 52 66 60" stroke="#B8862E" stroke-width="2" fill="none"/>
-            </svg>
-            <p style="font-size:0.85rem; letter-spacing:0.06em; text-transform:uppercase;">No image uploaded</p>
-          </div>
+        <div class="image-placeholder-box" id="painting-image-placeholder">
+          <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+            <rect x="8" y="8" width="64" height="64" rx="3"
+                  stroke="currentColor" stroke-width="2"/>
+            <rect x="18" y="18" width="44" height="44" rx="2"
+                  stroke="currentColor" stroke-width="1.5" stroke-dasharray="4 3"/>
+            <circle cx="40" cy="34" r="8" stroke="currentColor" stroke-width="2"/>
+            <path d="M14 60 Q26 44 40 48 Q54 52 66 60"
+                  stroke="currentColor" stroke-width="2" fill="none"/>
+          </svg>
+          <p>No image uploaded</p>
         </div>
       {% endif %}
     </div>
 
-    <!-- Info Column -->
-    <div class="detail-info">
+    <!-- ── Info Column ── -->
+    <div class="detail-info" id="painting-info">
 
-      <span class="card-style-badge" style="margin-bottom:0.75rem;">{{ painting.style }}</span>
+      <!-- Section label: Library (gold) -->
+      <div class="section-label" style="margin-bottom: 0.5rem;">
+        <span class="label-dot"></span>
+        {{ painting.style }}
+      </div>
 
       <h1 id="painting-title">{{ painting.title }}</h1>
 
@@ -47,12 +57,12 @@
         {{ painting.artist.name }}
       </a>
 
-      <!-- Meta grid -->
+      <!-- Metadata Grid -->
       <div class="detail-meta-grid" id="painting-meta">
 
         <div class="meta-item">
           <label>Year</label>
-          <span class="meta-value">{{ painting.year_created }}</span>
+          <span class="meta-value mono">{{ painting.year_created }}</span>
         </div>
 
         <div class="meta-item">
@@ -70,7 +80,7 @@
         {% if painting.dimensions %}
         <div class="meta-item">
           <label>Dimensions</label>
-          <span class="meta-value">{{ painting.dimensions }}</span>
+          <span class="meta-value mono">{{ painting.dimensions }}</span>
         </div>
         {% endif %}
 
@@ -83,16 +93,19 @@
 
         {% if painting.estimated_value %}
         <div class="meta-item" style="grid-column: 1 / -1;">
-          <label>Estimated Value</label>
+          <!-- Section label: Marketplace (burgundy) for value -->
+          <div class="section-label market" style="margin-bottom:0.4rem;">
+            <span class="label-dot"></span>
+            Estimated Value
+          </div>
           <span class="meta-value value-highlight" id="estimated-value">
-            ${{ painting.estimated_value|floatformat:"2" }}
+            {{ painting.estimated_value|inr }}
           </span>
         </div>
         {% endif %}
 
-      </div>
+      </div><!-- /detail-meta-grid -->
 
-      <!-- Story -->
       {% if painting.story %}
         <hr class="detail-divider" />
         <div class="detail-story" id="painting-story">
@@ -101,7 +114,7 @@
         </div>
       {% endif %}
 
-    </div>
-  </div>
+    </div><!-- /detail-info -->
+  </div><!-- /detail-layout -->
 
 {% endblock %}

@@ -1,0 +1,839 @@
+/* ═══════════════════════════════════════════════════════════════
+   ArtVault — Design System  (theme.css)
+   Light & Dark mode via CSS custom properties + .dark on <body>
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── 1. Custom Properties ──────────────────────────────────────── */
+:root {
+  /* Light palette */
+  --bg:           #F6F1E7;
+  --surface:      #FFFDF9;
+  --border:       #E3DBC9;
+  --text:         #2A2521;
+  --muted:        #6B6258;
+  --gold:         #B8862E;
+  --gold-light:   #D4A84B;
+  --gold-pale:    #F0DFB0;
+  --gold-subtle:  rgba(184,134,46,0.12);
+  --burgundy:     #7A2E2E;
+  --burgundy-bg:  rgba(122,46,46,0.08);
+
+  /* Derived */
+  --border-strong: rgba(184,134,46,0.55);
+  --shadow-sm:     0 2px 8px rgba(42,37,33,0.07);
+  --shadow-md:     0 6px 24px rgba(42,37,33,0.11);
+  --shadow-lg:     0 18px 52px rgba(42,37,33,0.16);
+  --radius-sm:     6px;
+  --radius-md:     12px;
+  --radius-pill:   999px;
+  --transition:    0.35s ease;
+
+  /* Frame animation */
+  --frame-size:    10px;
+  --frame-color:   var(--gold);
+}
+
+/* Dark palette — toggled by adding .dark to <body> */
+body.dark {
+  --bg:           #19160F;
+  --surface:      #242019;
+  --border:       #352F25;
+  --text:         #F3EDE0;
+  --muted:        #A89E8C;
+  --gold:         #D9A93C;
+  --gold-light:   #E8C162;
+  --gold-pale:    rgba(217,169,60,0.15);
+  --gold-subtle:  rgba(217,169,60,0.10);
+  --burgundy:     #C2554F;
+  --burgundy-bg:  rgba(194,85,79,0.10);
+
+  --border-strong: rgba(217,169,60,0.45);
+  --shadow-sm:     0 2px 10px rgba(0,0,0,0.35);
+  --shadow-md:     0 6px 28px rgba(0,0,0,0.45);
+  --shadow-lg:     0 18px 56px rgba(0,0,0,0.55);
+  --frame-color:   var(--gold);
+}
+
+/* ── 2. Smooth mode transition ─────────────────────────────────── */
+body,
+body *,
+body *::before,
+body *::after {
+  transition:
+    background-color var(--transition),
+    color            var(--transition),
+    border-color     var(--transition),
+    box-shadow       var(--transition);
+}
+
+/* Exclude transforms / opacity from the blanket transition so
+   hover animations stay snappy */
+.painting-card,
+.painting-card img,
+.gold-frame,
+.filter-btn,
+.theme-toggle,
+.back-link {
+  transition:
+    background-color var(--transition),
+    color            var(--transition),
+    border-color     var(--transition),
+    box-shadow       var(--transition),
+    transform        0.28s ease,
+    opacity          0.28s ease;
+}
+
+/* ── 3. Reset & Base ───────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  line-height: 1.72;
+  min-height: 100vh;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.22;
+}
+
+a {
+  color: var(--gold);
+  text-decoration: none;
+}
+a:hover { color: var(--gold-light); }
+
+img { max-width: 100%; display: block; }
+
+/* Mono for prices / numbers / labels */
+.mono {
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+/* ── 4. Site Header ────────────────────────────────────────────── */
+.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  box-shadow: var(--shadow-sm);
+}
+
+.header-inner {
+  max-width: 1300px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 66px;
+  gap: 1rem;
+}
+
+/* Logo */
+.site-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.logo-mark {
+  width: 36px;
+  height: 36px;
+  border: 2px solid var(--gold);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--gold);
+  flex-shrink: 0;
+  background: var(--gold-subtle);
+}
+
+.logo-text {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: 0.02em;
+}
+
+.logo-text span { color: var(--gold); }
+
+/* Nav */
+.site-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+  flex: 1;
+  justify-content: center;
+}
+
+.site-nav a {
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 500;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  padding: 0.45rem 1.1rem;
+  border-radius: var(--radius-pill);
+  transition: var(--transition);
+}
+
+.site-nav a:hover,
+.site-nav a.active {
+  color: var(--gold);
+  background: var(--gold-subtle);
+}
+
+/* Header right: toggle */
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+/* ── 5. Theme Toggle Button ────────────────────────────────────── */
+.theme-toggle {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  line-height: 1;
+  box-shadow: var(--shadow-sm);
+}
+
+.theme-toggle:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: var(--gold-subtle);
+}
+
+.theme-toggle .icon-sun  { display: none; }
+.theme-toggle .icon-moon { display: block; }
+
+body.dark .theme-toggle .icon-sun  { display: block; }
+body.dark .theme-toggle .icon-moon { display: none; }
+
+/* ── 6. Main Content ───────────────────────────────────────────── */
+.site-main {
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 3.5rem 2rem 5rem;
+}
+
+/* ── 7. Footer ─────────────────────────────────────────────────── */
+.site-footer {
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  padding: 2rem;
+  text-align: center;
+}
+
+.site-footer p {
+  font-size: 0.78rem;
+  color: var(--muted);
+  letter-spacing: 0.05em;
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+.site-footer .gold { color: var(--gold); }
+
+/* ── 8. Page Header ────────────────────────────────────────────── */
+.page-header {
+  margin-bottom: 2.75rem;
+  padding-bottom: 1.75rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.page-header h1 {
+  font-size: clamp(1.9rem, 4vw, 3rem);
+  margin-bottom: 0.4rem;
+}
+
+.page-header .subtitle {
+  font-size: 0.95rem;
+  color: var(--muted);
+  font-style: italic;
+  font-family: 'Playfair Display', serif;
+}
+
+/* ── 9. Section Label ──────────────────────────────────────────── */
+/* Gold — used for "Library" / collection sections */
+.section-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 0.5rem;
+}
+
+.section-label .label-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--gold);
+  flex-shrink: 0;
+}
+
+/* Burgundy — used for "Marketplace" / value sections */
+.section-label.market {
+  color: var(--burgundy);
+}
+.section-label.market .label-dot {
+  background: var(--burgundy);
+}
+
+/* Section heading with decorative rule */
+.section-heading {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.55rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 1.75rem;
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.section-heading::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* ── 10. Gold Frame ────────────────────────────────────────────── */
+/*
+  The frame uses four absolutely-positioned pseudo-elements that
+  animate their width/height from 0 to 100% via keyframes,
+  creating a "border drawing itself in" effect.
+  We use outline + clip-path on four thin divs inside .gold-frame.
+*/
+
+.gold-frame {
+  position: relative;
+  display: inline-block;
+  padding: 10px;
+  background: color-mix(in srgb, var(--gold) 6%, var(--surface));
+}
+
+/* The four animated border segments */
+.gold-frame::before,
+.gold-frame::after,
+.gold-frame .frame-h,
+.gold-frame .frame-h::before {
+  content: '';
+  position: absolute;
+  background: var(--frame-color);
+  pointer-events: none;
+}
+
+/* Top edge */
+.gold-frame::before {
+  top: 0; left: 0;
+  height: 2px; width: 0;
+  animation: frame-draw-h 0.38s ease forwards;
+  animation-delay: 0s;
+}
+
+/* Bottom edge */
+.gold-frame::after {
+  bottom: 0; right: 0;
+  height: 2px; width: 0;
+  animation: frame-draw-h 0.38s ease forwards;
+  animation-delay: 0.75s;
+}
+
+/* Right edge */
+.gold-frame .frame-v-r {
+  position: absolute;
+  top: 0; right: 0;
+  width: 2px; height: 0;
+  background: var(--frame-color);
+  animation: frame-draw-v 0.38s ease forwards;
+  animation-delay: 0.38s;
+}
+
+/* Left edge */
+.gold-frame .frame-v-l {
+  position: absolute;
+  bottom: 0; left: 0;
+  width: 2px; height: 0;
+  background: var(--frame-color);
+  animation: frame-draw-v 0.38s ease forwards;
+  animation-delay: 1.13s;
+}
+
+@keyframes frame-draw-h {
+  from { width: 0; }
+  to   { width: 100%; }
+}
+
+@keyframes frame-draw-v {
+  from { height: 0; }
+  to   { height: 100%; }
+}
+
+/* Inner corner inset */
+.gold-frame .frame-inner {
+  position: absolute;
+  inset: 5px;
+  border: 1px solid rgba(255,255,255,0.15);
+  pointer-events: none;
+  border-radius: 1px;
+}
+
+.gold-frame img {
+  display: block;
+  position: relative;
+  z-index: 1;
+}
+
+/* Full-width frame variant (detail page) */
+.gold-frame-full {
+  display: block;
+}
+.gold-frame-full .gold-frame {
+  display: block;
+  width: 100%;
+}
+.gold-frame-full .gold-frame img {
+  width: 100%;
+  height: auto;
+  max-height: 580px;
+  object-fit: contain;
+}
+
+/* ── 11. Filter Bar ────────────────────────────────────────────── */
+.filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 2.75rem;
+}
+
+.filter-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-right: 0.25rem;
+}
+
+.filter-btn {
+  display: inline-block;
+  padding: 0.4rem 1.1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  font-size: 0.82rem;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  color: var(--muted);
+  background: var(--surface);
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.filter-btn:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: var(--gold-subtle);
+}
+
+.filter-btn.active {
+  border-color: var(--gold);
+  background: var(--gold);
+  color: #fff;
+  font-weight: 600;
+}
+
+body.dark .filter-btn.active {
+  color: #19160F;
+}
+
+/* ── 12. Painting Card ─────────────────────────────────────────── */
+.painting-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 2rem;
+}
+
+.painting-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+}
+
+.painting-card:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-5px);
+  border-color: var(--gold);
+}
+
+.card-image-wrap {
+  overflow: hidden;
+  background: color-mix(in srgb, var(--gold) 5%, var(--surface));
+  aspect-ratio: 4 / 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.card-image-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.45s ease !important;
+}
+
+.painting-card:hover .card-image-wrap img {
+  transform: scale(1.05);
+}
+
+/* Thin gold frame overlay on card images */
+.card-image-wrap::after {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  border: 1px solid var(--gold);
+  opacity: 0.35;
+  pointer-events: none;
+  border-radius: 2px;
+}
+
+/* Placeholder */
+.card-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  gap: 0.6rem;
+}
+
+.card-placeholder svg { opacity: 0.35; }
+
+.card-placeholder span {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* Card body */
+.card-body {
+  padding: 1.3rem 1.5rem 1.5rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Style badge — pill */
+.card-style-badge {
+  display: inline-block;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold);
+  background: var(--gold-subtle);
+  border: 1px solid color-mix(in srgb, var(--gold) 30%, transparent);
+  border-radius: var(--radius-pill);
+  padding: 0.22rem 0.75rem;
+  margin-bottom: 0.65rem;
+  width: fit-content;
+}
+
+/* Card title */
+.card-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.08rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 0.35rem;
+  line-height: 1.3;
+}
+
+.card-title a {
+  color: var(--text);
+}
+
+.card-title a:hover { color: var(--gold); }
+
+/* Card meta row */
+.card-meta {
+  font-size: 0.82rem;
+  color: var(--muted);
+  margin-top: auto;
+  padding-top: 0.85rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.card-meta .artist-link {
+  color: var(--gold);
+  font-weight: 500;
+}
+.card-meta .artist-link:hover { color: var(--gold-light); }
+
+/* Value — mono + burgundy */
+.card-value {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--burgundy);
+  background: var(--burgundy-bg);
+  padding: 0.15rem 0.6rem;
+  border-radius: var(--radius-pill);
+}
+
+/* ── 13. Detail Page ───────────────────────────────────────────── */
+.detail-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4.5rem;
+  align-items: start;
+}
+
+@media (max-width: 860px) {
+  .detail-layout { grid-template-columns: 1fr; gap: 2.5rem; }
+}
+
+/* Metadata grid */
+.detail-meta-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.1rem 1.75rem;
+  margin-bottom: 2rem;
+}
+
+.meta-item label {
+  display: block;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.22rem;
+}
+
+.meta-item .meta-value {
+  font-size: 0.95rem;
+  color: var(--text);
+  font-weight: 500;
+}
+
+/* Estimated value — mono + burgundy pill */
+.meta-item .meta-value.value-highlight {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--burgundy);
+  background: var(--burgundy-bg);
+  display: inline-block;
+  padding: 0.3rem 1rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid color-mix(in srgb, var(--burgundy) 25%, transparent);
+}
+
+/* Artist link on detail page */
+.detail-artist-link {
+  font-size: 1rem;
+  color: var(--gold);
+  font-weight: 500;
+  margin-bottom: 1.75rem;
+  display: inline-block;
+}
+.detail-artist-link:hover { color: var(--gold-light); }
+
+/* Story */
+.detail-divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 1.75rem 0;
+}
+
+.detail-story h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.08rem;
+  font-weight: 500;
+  font-style: italic;
+  color: var(--muted);
+  margin-bottom: 0.85rem;
+}
+
+.detail-story p {
+  font-size: 0.97rem;
+  line-height: 1.9;
+  color: var(--text);
+}
+
+/* ── 14. Artist Profile ────────────────────────────────────────── */
+.artist-profile-header {
+  display: flex;
+  gap: 3rem;
+  align-items: flex-start;
+  margin-bottom: 3.5rem;
+  padding-bottom: 3rem;
+  border-bottom: 1px solid var(--border);
+}
+
+@media (max-width: 640px) {
+  .artist-profile-header { flex-direction: column; gap: 1.75rem; }
+}
+
+.artist-photo-wrap { flex-shrink: 0; }
+
+.artist-photo-wrap .gold-frame img {
+  width: 210px;
+  height: 210px;
+  object-fit: cover;
+}
+
+.artist-photo-placeholder {
+  width: 210px;
+  height: 210px;
+  background: var(--gold-subtle);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Playfair Display', serif;
+  font-size: 4rem;
+  font-weight: 700;
+  color: var(--gold);
+}
+
+.artist-info h1 {
+  font-size: clamp(1.9rem, 3.5vw, 2.7rem);
+  margin-bottom: 0.3rem;
+}
+
+.artist-born {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--muted);
+  letter-spacing: 0.07em;
+  margin-bottom: 1rem;
+}
+
+.artist-bio {
+  font-size: 0.97rem;
+  line-height: 1.9;
+  color: var(--text);
+  max-width: 680px;
+}
+
+/* ── 15. Empty State ───────────────────────────────────────────── */
+.empty-state {
+  text-align: center;
+  padding: 5rem 2rem;
+  color: var(--muted);
+}
+
+.empty-state h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.35rem;
+  margin-bottom: 0.5rem;
+  color: var(--text);
+}
+
+.empty-state p { font-size: 0.9rem; }
+
+/* ── 16. Back Link ─────────────────────────────────────────────── */
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--muted);
+  margin-bottom: 2.25rem;
+  border: 1px solid var(--border);
+  padding: 0.4rem 1rem;
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+}
+
+.back-link:hover {
+  color: var(--gold);
+  border-color: var(--gold);
+  background: var(--gold-subtle);
+}
+
+/* ── 17. Detail image placeholder ─────────────────────────────── */
+.image-placeholder-box {
+  width: 100%;
+  min-height: 380px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--gold-subtle);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--muted);
+  gap: 1rem;
+  padding: 2rem;
+}
+
+.image-placeholder-box svg { opacity: 0.35; }
+
+.image-placeholder-box p {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* ── 18. Responsive ────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .site-header  { padding: 0 1rem; }
+  .site-main    { padding: 2rem 1rem 3.5rem; }
+  .painting-grid { grid-template-columns: 1fr; gap: 1.5rem; }
+  .detail-meta-grid { grid-template-columns: 1fr; }
+  .site-nav { display: none; }
+}

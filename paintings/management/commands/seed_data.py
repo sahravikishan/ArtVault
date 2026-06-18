@@ -61,7 +61,7 @@ PAINTINGS = [
         'materials': 'Oil on linen',
         'dimensions': '90 × 120 cm',
         'current_location': 'Private Collection, Paris',
-        'estimated_value': '28500.00',
+        'estimated_value': '8500.00',
     },
     {
         'artist_name': 'Elena Vasquez',
@@ -78,7 +78,7 @@ PAINTINGS = [
         'materials': 'Oil on canvas',
         'dimensions': '60 × 75 cm',
         'current_location': 'Artist\'s Studio, Paris',
-        'estimated_value': '14200.00',
+        'estimated_value': '4200.00',
     },
     {
         'artist_name': 'Hiroshi Tanaka',
@@ -96,7 +96,7 @@ PAINTINGS = [
         'materials': 'Sumi ink and mineral pigments on Japanese washi paper, mounted on board',
         'dimensions': '180 × 240 cm',
         'current_location': 'Tanaka Studio, Kyoto',
-        'estimated_value': '67000.00',
+        'estimated_value': '15000.00',
     },
     {
         'artist_name': 'Hiroshi Tanaka',
@@ -114,7 +114,7 @@ PAINTINGS = [
         'materials': 'Acrylic and oil stick on canvas',
         'dimensions': '150 × 200 cm',
         'current_location': 'Mori Art Museum, Tokyo (on loan)',
-        'estimated_value': '52000.00',
+        'estimated_value': '12500.00',
     },
     {
         'artist_name': 'Amara Osei',
@@ -132,7 +132,7 @@ PAINTINGS = [
         'materials': 'Oil and 24k gold leaf on canvas',
         'dimensions': '120 × 160 cm',
         'current_location': 'Saatchi Gallery, London',
-        'estimated_value': '89000.00',
+        'estimated_value': '14000.00',
     },
     {
         'artist_name': 'Amara Osei',
@@ -150,7 +150,7 @@ PAINTINGS = [
         'materials': 'Acrylic, oil pastel, and collage on panel',
         'dimensions': '100 × 130 cm',
         'current_location': 'Private Collection, Accra',
-        'estimated_value': '41500.00',
+        'estimated_value': '6500.00',
     },
 ]
 
@@ -177,7 +177,7 @@ class Command(BaseCommand):
         self.stdout.write('Seeding paintings...')
         for data in PAINTINGS:
             artist = artist_map[data['artist_name']]
-            painting, created = Painting.objects.get_or_create(
+            painting, created = Painting.objects.update_or_create(
                 title=data['title'],
                 artist=artist,
                 defaults={
@@ -185,12 +185,12 @@ class Command(BaseCommand):
                     'style': data['style'],
                     'story': data['story'],
                     'materials': data['materials'],
-                    'dimensions': data['dimensions'],
                     'current_location': data.get('current_location', ''),
                     'estimated_value': data.get('estimated_value'),
+                    'dimensions': data.get('dimensions', ''),
                 }
             )
-            status = 'Created' if created else 'Already exists'
+            status = 'Created' if created else 'Updated'
             self.stdout.write(f'  {status}: {painting.title}')
 
         self.stdout.write(self.style.SUCCESS(

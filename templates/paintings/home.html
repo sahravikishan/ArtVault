@@ -1,17 +1,23 @@
 {% extends "base.html" %}
+{% load currency_tags %}
 
 {% block title %}ArtVault — The Collection{% endblock %}
 {% block meta_description %}Browse the private ArtVault collection — paintings catalogued by style, artist, and story.{% endblock %}
 
 {% block content %}
 
-  <div class="page-header">
+  <!-- Page Header -->
+  <div class="page-header" id="collection-header">
+    <div class="section-label">
+      <span class="label-dot"></span>
+      Library
+    </div>
     <h1>The Collection</h1>
     <p class="subtitle">A private vault of paintings, each with its own history and story.</p>
   </div>
 
   <!-- Style Filter Bar -->
-  <div class="filter-bar" id="filter-bar" role="navigation" aria-label="Filter by style">
+  <nav class="filter-bar" id="filter-bar" aria-label="Filter by style">
     <span class="filter-label">Filter:</span>
 
     <a href="{% url 'paintings:home' %}"
@@ -27,7 +33,7 @@
         {{ label }}
       </a>
     {% endfor %}
-  </div>
+  </nav>
 
   <!-- Painting Grid -->
   {% if paintings %}
@@ -35,40 +41,52 @@
       {% for painting in paintings %}
         <article class="painting-card" id="card-{{ painting.pk }}">
 
-          <a href="{% url 'paintings:detail' painting.pk %}" class="card-image-wrap" tabindex="-1" aria-hidden="true">
+          <!-- Image / Frame -->
+          <a href="{% url 'paintings:detail' painting.pk %}"
+             class="card-image-wrap"
+             tabindex="-1"
+             aria-hidden="true">
             {% if painting.image %}
               <img src="{{ painting.image.url }}"
                    alt="{{ painting.title }}"
                    loading="lazy" />
             {% else %}
               <div class="card-placeholder">
-                <!-- Frame icon -->
                 <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-                  <rect x="6" y="6" width="36" height="36" rx="2" stroke="#B8862E" stroke-width="2"/>
-                  <rect x="12" y="12" width="24" height="24" rx="1" stroke="#B8862E" stroke-width="1" stroke-dasharray="3 2"/>
-                  <circle cx="24" cy="21" r="4" stroke="#B8862E" stroke-width="1.5"/>
-                  <path d="M11 34 Q17 26 24 28 Q31 30 37 34" stroke="#B8862E" stroke-width="1.5" fill="none"/>
+                  <rect x="6" y="6" width="36" height="36" rx="2"
+                        stroke="currentColor" stroke-width="1.5"/>
+                  <rect x="12" y="12" width="24" height="24" rx="1"
+                        stroke="currentColor" stroke-width="1" stroke-dasharray="3 2"/>
+                  <circle cx="24" cy="21" r="4" stroke="currentColor" stroke-width="1.5"/>
+                  <path d="M11 34 Q17 26 24 28 Q31 30 37 34"
+                        stroke="currentColor" stroke-width="1.5" fill="none"/>
                 </svg>
                 <span>No Image</span>
               </div>
             {% endif %}
           </a>
 
+          <!-- Card Body -->
           <div class="card-body">
             <span class="card-style-badge">{{ painting.style }}</span>
+
             <h2 class="card-title">
               <a href="{% url 'paintings:detail' painting.pk %}">{{ painting.title }}</a>
             </h2>
+
             <div class="card-meta">
               <span>
-                <a href="{% url 'artists:detail' painting.artist.pk %}" class="artist-link">
+                <a href="{% url 'artists:detail' painting.artist.pk %}"
+                   class="artist-link">
                   {{ painting.artist.name }}
                 </a>
-                &nbsp;·&nbsp; {{ painting.year_created }}
+                &nbsp;·&nbsp;
+                <span class="mono">{{ painting.year_created }}</span>
               </span>
+
               {% if painting.estimated_value %}
                 <span class="card-value">
-                  ${{ painting.estimated_value|floatformat:"0" }}
+                  {{ painting.estimated_value|inr }}
                 </span>
               {% endif %}
             </div>
