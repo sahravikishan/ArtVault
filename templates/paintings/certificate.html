@@ -1,0 +1,463 @@
+{% load static %}
+{% load currency_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Certificate of Authenticity — {{ order.painting.title }} | ArtVault</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #F4EFE6;
+      --paper: #FAF6EF;
+      --text: #221D18;
+      --muted: #6E645A;
+      --gold: #A28246;
+      --gold-dark: #7A602E;
+      --border-dark: #383028;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem 1rem;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    /* Top Action Bar (Hidden on Print) */
+    .coa-action-bar {
+      width: 100%;
+      max-width: 980px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      padding: 0.75rem 0;
+    }
+
+    .coa-btn-back {
+      font-family: 'Cinzel', serif;
+      font-size: 0.8rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+    .coa-btn-back:hover { color: var(--gold-dark); }
+
+    .coa-actions-right {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .coa-btn-print {
+      font-family: 'Cinzel', serif;
+      font-size: 0.85rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      background: var(--gold-dark);
+      color: #fff;
+      border: none;
+      padding: 0.75rem 1.8rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      transition: all 0.3s;
+    }
+    .coa-btn-print:hover {
+      background: var(--gold);
+      transform: translateY(-1px);
+    }
+
+    /* Certificate Document */
+    .coa-document {
+      width: 100%;
+      max-width: 980px;
+      background: var(--paper);
+      padding: 45px 55px;
+      border: 12px double var(--border-dark);
+      position: relative;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+      overflow: hidden;
+    }
+
+    /* Inner Guilloche Border */
+    .coa-inner-border {
+      border: 1px solid var(--gold);
+      padding: 35px 40px;
+      position: relative;
+    }
+
+    /* Corner Accents */
+    .coa-corner {
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      font-size: 1.3rem;
+      color: var(--gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .coa-corner.tl { top: -14px; left: -14px; }
+    .coa-corner.tr { top: -14px; right: -14px; }
+    .coa-corner.bl { bottom: -14px; left: -14px; }
+    .coa-corner.br { bottom: -14px; right: -14px; }
+
+    /* Header */
+    .coa-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .coa-crest {
+      font-family: 'Cinzel', serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.5rem;
+    }
+
+    .coa-title {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(2rem, 3.5vw, 2.8rem);
+      letter-spacing: 0.12em;
+      font-weight: 500;
+      color: var(--border-dark);
+      margin-bottom: 0.25rem;
+    }
+
+    .coa-subtitle {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.15rem;
+      font-style: italic;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+    }
+
+    .coa-serial-pill {
+      display: inline-block;
+      margin-top: 1rem;
+      font-family: 'Cinzel', serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--gold-dark);
+      border: 1px solid var(--gold);
+      padding: 0.3rem 1.2rem;
+      background: rgba(162, 130, 70, 0.06);
+    }
+
+    /* Declaration */
+    .coa-declaration {
+      text-align: center;
+      max-width: 780px;
+      margin: 0 auto 2.5rem;
+      font-size: 1.2rem;
+      line-height: 1.7;
+      color: var(--text);
+    }
+
+    /* Work Details Grid */
+    .coa-work-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem 3rem;
+      background: rgba(244, 239, 230, 0.5);
+      border: 1px solid rgba(162, 130, 70, 0.3);
+      padding: 2rem 2.5rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .coa-field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
+    .coa-label {
+      font-family: 'Cinzel', serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .coa-value {
+      font-size: 1.25rem;
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .coa-value.title-highlight {
+      font-family: 'Cinzel', serif;
+      font-size: 1.35rem;
+      color: var(--border-dark);
+      letter-spacing: 0.05em;
+    }
+
+    .coa-value.gold-highlight {
+      color: var(--gold-dark);
+      font-family: 'Cinzel', serif;
+      font-weight: 600;
+    }
+
+    .coa-mono {
+      font-family: 'Courier New', monospace;
+      font-size: 1rem;
+    }
+
+    /* Signatures & Seal Section */
+    .coa-signatures-row {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 2rem;
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+    }
+
+    .coa-signature-block {
+      text-align: center;
+    }
+
+    .coa-sig-line {
+      width: 100%;
+      height: 1px;
+      background: var(--muted);
+      margin-bottom: 0.6rem;
+    }
+
+    .coa-sig-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .coa-sig-role {
+      font-family: 'Cinzel', serif;
+      font-size: 0.68rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* Embossed Gold Seal */
+    .coa-seal {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      border: 3px double var(--gold);
+      background: radial-gradient(circle, #FAF6EF 40%, #E8DFC8 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--gold-dark);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      position: relative;
+    }
+
+    .coa-seal-monogram {
+      font-family: 'Cinzel', serif;
+      font-size: 1.6rem;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .coa-seal-text {
+      font-family: 'Cinzel', serif;
+      font-size: 0.5rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    /* Footer Legal Note */
+    .coa-footer {
+      margin-top: 2.5rem;
+      text-align: center;
+      border-top: 1px solid rgba(162, 130, 70, 0.2);
+      padding-top: 1rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    /* Print Stylesheet */
+    @media print {
+      @page {
+        size: A4 portrait;
+        margin: 10mm;
+      }
+
+      body {
+        background: none;
+        padding: 0;
+      }
+
+      .coa-action-bar { display: none !important; }
+
+      .coa-document {
+        box-shadow: none;
+        border: 8px double #000;
+        max-width: 100%;
+        padding: 30px 40px;
+      }
+
+      .coa-btn-print, .coa-btn-back { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Action Toolbar -->
+  <div class="coa-action-bar">
+    <a href="{% url 'paintings:order_success' order.pk %}" class="coa-btn-back">
+      ← Return to Order Summary
+    </a>
+    <div class="coa-actions-right">
+      <button onclick="window.print()" class="coa-btn-print">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="6 9 6 2 18 2 18 9"></polyline>
+          <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+          <rect x="6" y="14" width="12" height="8"></rect>
+        </svg>
+        Print / Save Certificate (PDF)
+      </button>
+    </div>
+  </div>
+
+  <!-- Certificate Body -->
+  <main class="coa-document" role="document">
+    <div class="coa-inner-border">
+      
+      <!-- Ornate Corners -->
+      <span class="coa-corner tl">✦</span>
+      <span class="coa-corner tr">✦</span>
+      <span class="coa-corner bl">✦</span>
+      <span class="coa-corner br">✦</span>
+
+      <!-- Header -->
+      <header class="coa-header">
+        <p class="coa-crest">Archivum ArtVault · Curatorial Registry</p>
+        <h1 class="coa-title">Certificate of Authenticity</h1>
+        <p class="coa-subtitle">Certificatum Authenticitatis et Provenientiae</p>
+        <div class="coa-serial-pill">
+          COA Ref: {{ certificate_number }}
+        </div>
+      </header>
+
+      <!-- Declaration -->
+      <p class="coa-declaration">
+        This document serves as permanent, official attestation that the artwork catalogued herein is an authentic, original creation conserved within the <strong>ArtVault Permanent Registry</strong>, and that lawful title and stewardship have been formally transferred to the registered collector.
+      </p>
+
+      <!-- Work Details Grid -->
+      <section class="coa-work-grid">
+        <div class="coa-field">
+          <span class="coa-label">Artwork Title</span>
+          <span class="coa-value title-highlight">{{ order.painting.title }}</span>
+        </div>
+
+        <div class="coa-field">
+          <span class="coa-label">Master Artist</span>
+          <span class="coa-value">{{ order.painting.artist.name }}</span>
+        </div>
+
+        <div class="coa-field">
+          <span class="coa-label">Year of Creation</span>
+          <span class="coa-value coa-mono">{{ order.painting.year_created }}</span>
+        </div>
+
+        <div class="coa-field">
+          <span class="coa-label">Movement / Style</span>
+          <span class="coa-value">{{ order.painting.style }}</span>
+        </div>
+
+        {% if order.painting.materials %}
+        <div class="coa-field">
+          <span class="coa-label">Medium & Materials</span>
+          <span class="coa-value">{{ order.painting.materials }}</span>
+        </div>
+        {% endif %}
+
+        {% if order.painting.dimensions %}
+        <div class="coa-field">
+          <span class="coa-label">Dimensions</span>
+          <span class="coa-value coa-mono">{{ order.painting.dimensions }}</span>
+        </div>
+        {% endif %}
+
+        <div class="coa-field">
+          <span class="coa-label">Registered Collector</span>
+          <span class="coa-value">{{ order.buyer_name }}</span>
+        </div>
+
+        <div class="coa-field">
+          <span class="coa-label">Date of Acquisition</span>
+          <span class="coa-value coa-mono">{{ order.created_at|date:"d F Y" }}</span>
+        </div>
+
+        <div class="coa-field">
+          <span class="coa-label">Acquisition Value</span>
+          <span class="coa-value gold-highlight">{{ order.amount|inr }}</span>
+        </div>
+
+        <div class="coa-field">
+          <span class="coa-label">Payment Verification</span>
+          <span class="coa-value coa-mono" style="font-size:0.9rem;">{{ order.razorpay_payment_id }}</span>
+        </div>
+      </section>
+
+      <!-- Signatures and Embossed Seal -->
+      <div class="coa-signatures-row">
+        <div class="coa-signature-block">
+          <div class="coa-sig-line"></div>
+          <p class="coa-sig-name">M. V. Sterling</p>
+          <p class="coa-sig-role">Chief Curatorial Officer</p>
+        </div>
+
+        <!-- The Embossed Gold Seal -->
+        <div class="coa-seal" aria-hidden="true">
+          <span class="coa-seal-monogram">AV</span>
+          <span class="coa-seal-text">Authentic</span>
+        </div>
+
+        <div class="coa-signature-block">
+          <div class="coa-sig-line"></div>
+          <p class="coa-sig-name">Amara Osei</p>
+          <p class="coa-sig-role">Head of Provenance & Archive</p>
+        </div>
+      </div>
+
+      <!-- Footer Note -->
+      <footer class="coa-footer">
+        ArtVault Archive &bull; Sealed and Recorded in the Immutable Vault Registry &bull; Serial {{ certificate_number }}
+      </footer>
+
+    </div>
+  </main>
+
+</body>
+</html>

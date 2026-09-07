@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}Exhibitions — ArtVault Curated Collections{% endblock %}
+{% block meta_description %}Explore thematic presentations, curated series, and premier exhibitions conserved within ArtVault.{% endblock %}
+
+{% block content %}
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="section-label">
+      <span class="label-dot"></span>
+      Curatorial Presentations
+    </div>
+    <h1>Curated Exhibitions</h1>
+    <p class="subtitle">Thematic dialogues, retrospective studies, and special presentations curated from the permanent vault collection.</p>
+  </div>
+
+  <!-- ── Section 1: Active / Ongoing Exhibitions ── -->
+  <section class="exhibitions-section">
+    <div class="exhibitions-section-header">
+      <h2 class="exhibitions-section-title">Current & Ongoing Presentations</h2>
+      <span class="exhibitions-count">{{ ongoing_exhibitions.count }} exhibition{{ ongoing_exhibitions.count|pluralize }}</span>
+    </div>
+
+    {% if ongoing_exhibitions %}
+      <div class="exhibition-cards-stack">
+        {% for exh in ongoing_exhibitions %}
+          <article class="exhibition-card {% if exh.featured %}featured{% endif %}">
+            
+            <div class="exhibition-media">
+              {% if exh.cover_image %}
+                <img src="{{ exh.cover_image.url }}" alt="{{ exh.title }}" class="exhibition-cover-img" />
+              {% else %}
+                <div class="exhibition-cover-placeholder">
+                  <div class="exh-seal">AV</div>
+                  <span>Curatorial Series</span>
+                </div>
+              {% endif %}
+              <span class="exhibition-status-badge">Ongoing Exhibition</span>
+            </div>
+
+            <div class="exhibition-content">
+              {% if exh.subtitle %}
+                <p class="exhibition-eyebrow">{{ exh.subtitle }}</p>
+              {% endif %}
+              
+              <h3 class="exhibition-card-title">
+                <a href="{% url 'paintings:exhibition_detail' exh.slug %}">{{ exh.title }}</a>
+              </h3>
+
+              <div class="exhibition-dates-bar">
+                {% if exh.start_date %}
+                  <span>From {{ exh.start_date|date:"F Y" }}</span>
+                  {% if exh.end_date %}
+                    <span> &mdash; Until {{ exh.end_date|date:"F Y" }}</span>
+                  {% else %}
+                    <span> &mdash; Permanent Presentation</span>
+                  {% endif %}
+                {% else %}
+                  <span>Permanent Presentation</span>
+                {% endif %}
+                <span class="meta-dot">&bull;</span>
+                <span>Curated by {{ exh.curator_name }}</span>
+              </div>
+
+              <p class="exhibition-statement-snippet">
+                {{ exh.curator_statement|truncatewords:45 }}
+              </p>
+
+              <div class="exhibition-card-footer">
+                <span class="exhibition-works-count">
+                  {{ exh.paintings.count }} Masterpiece{{ exh.paintings.count|pluralize }} on Display
+                </span>
+                <a href="{% url 'paintings:exhibition_detail' exh.slug %}" class="btn-exhibition-enter">
+                  Enter Exhibition & View Works →
+                </a>
+              </div>
+            </div>
+
+          </article>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <h3>No current exhibitions active</h3>
+        <p>Upcoming curated exhibitions and retrospective presentations will be announced shortly.</p>
+      </div>
+    {% endif %}
+  </section>
+
+  <!-- ── Section 2: Past / Archived Presentations ── -->
+  {% if past_exhibitions %}
+    <section class="exhibitions-section" style="margin-top: 5rem;">
+      <div class="exhibitions-section-header">
+        <h2 class="exhibitions-section-title">Archived Exhibitions</h2>
+        <span class="exhibitions-count">{{ past_exhibitions.count }} retrospective{{ past_exhibitions.count|pluralize }}</span>
+      </div>
+
+      <div class="past-exhibitions-grid">
+        {% for exh in past_exhibitions %}
+          <div class="past-exhibition-item">
+            <span class="past-date">{{ exh.start_date|date:"Y" }} &mdash; {{ exh.end_date|date:"Y" }}</span>
+            <h4 class="past-title">
+              <a href="{% url 'paintings:exhibition_detail' exh.slug %}">{{ exh.title }}</a>
+            </h4>
+            <p class="past-meta">{{ exh.paintings.count }} works archived &bull; Curated by {{ exh.curator_name }}</p>
+            <a href="{% url 'paintings:exhibition_detail' exh.slug %}" class="artist-view-link">View Catalogue →</a>
+          </div>
+        {% endfor %}
+      </div>
+    </section>
+  {% endif %}
+
+{% endblock %}

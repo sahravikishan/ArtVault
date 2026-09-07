@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}Artist Profile &amp; Payout Settings — ArtVault{% endblock %}
+
+{% block content %}
+<div class="auth-page" style="min-height: auto; padding: 2rem 1rem 5rem;">
+  <div class="auth-card" style="max-width: 680px;">
+
+    <a href="{% url 'artists:dashboard' %}" class="back-link" style="margin-bottom: 1.5rem; display: inline-block;">
+      ← Back to Artist Studio
+    </a>
+
+    <div class="auth-header" style="text-align: left; margin-bottom: 2rem;">
+      <span class="auth-eyebrow">Studio Profile &amp; Financial Settings</span>
+      <h1 class="auth-title">Artist Profile &amp; Payouts</h1>
+      <p class="auth-subtitle">Manage your public biography shown on your artist page and configure your direct payout accounts for sold artwork.</p>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" class="auth-form">
+      {% csrf_token %}
+
+      <div class="form-group">
+        <label for="name">Public Artist / Display Name *</label>
+        <input type="text" id="name" name="name" required
+               placeholder="e.g. S. H. Raza" value="{{ artist.name|default:'' }}">
+      </div>
+
+      <div class="form-group">
+        <label for="birth_year">Birth Year / Era</label>
+        <input type="number" id="birth_year" name="birth_year"
+               placeholder="e.g. 1985" min="1800" max="2026" value="{{ artist.birth_year|default:'' }}">
+      </div>
+
+      <div class="form-group">
+        <label for="bio">Biography &amp; Curatorial Statement</label>
+        <textarea id="bio" name="bio" rows="5"
+                  placeholder="Describe your creative journey, aesthetic philosophy, exhibitions, and achievements...">{{ artist.bio|default:'' }}</textarea>
+      </div>
+
+      <!-- Artist Portrait Photo -->
+      <div class="form-group">
+        <label for="photo">Artist Portrait Photograph</label>
+        {% if artist.photo %}
+          <div style="margin-bottom: 0.75rem; display: flex; align-items: center; gap: 1rem;">
+            <img src="{{ artist.photo.url }}" alt="{{ artist.name }}" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border);">
+            <span class="studio-muted" style="font-size: 0.95rem;">Current portrait. Uploading a new photo will replace this.</span>
+          </div>
+        {% endif %}
+        <input type="file" id="photo" name="photo" accept="image/*"
+               style="font-family:'Cormorant Garamond',serif; padding: 0.5rem 0;">
+      </div>
+
+      <!-- Payout Banking & UPI Details -->
+      <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border);">
+        <h3 style="font-family: 'Playfair Display', serif; font-size: 1.3rem; margin-bottom: 0.5rem;">Direct Payout Details</h3>
+        <p class="studio-muted" style="font-size: 0.95rem; margin-bottom: 1.25rem;">
+          When your artwork is acquired by a collector, your 85% net payout will be disbursed to these details.
+        </p>
+
+        <div class="form-group">
+          <label for="payout_upi_id">Payout UPI ID (VPA)</label>
+          <input type="text" id="payout_upi_id" name="payout_upi_id"
+                 placeholder="e.g. artistname@okaxis or artistname@okhdfcbank" value="{{ artist.payout_upi_id|default:'' }}">
+        </div>
+
+        <div class="form-group">
+          <label for="payout_bank_details">Bank Account Details (A/C No &amp; IFSC)</label>
+          <textarea id="payout_bank_details" name="payout_bank_details" rows="3"
+                    placeholder="Bank Name, Account Number, Account Holder Name, and IFSC Code">{{ artist.payout_bank_details|default:'' }}</textarea>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+        <button type="submit" class="btn-acquire" style="flex: 1; border: none; cursor: pointer;">
+          Save Profile &amp; Payout Settings
+        </button>
+        <a href="{% url 'artists:dashboard' %}" class="btn-studio-secondary" style="text-decoration: none; padding: 0.85rem 1.5rem;">
+          Cancel
+        </a>
+      </div>
+
+    </form>
+
+  </div>
+</div>
+{% endblock %}

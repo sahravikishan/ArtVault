@@ -1,0 +1,257 @@
+{% extends "base.html" %}
+
+{% block title %}Create Account — ArtVault Registration{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+  <div class="auth-card">
+
+    <!-- Role Switcher (Collector vs Artist) -->
+    <div class="auth-role-tabs" role="tablist" aria-label="Account Type Selection">
+      <button type="button"
+              class="auth-role-tab {% if active_role != 'artist' %}active{% endif %}"
+              id="tab-collector"
+              role="tab"
+              aria-selected="{% if active_role != 'artist' %}true{% else %}false{% endif %}">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+          <circle cx="12" cy="7" r="4"/>
+        </svg>
+        <span>Collector / Buyer</span>
+      </button>
+      <button type="button"
+              class="auth-role-tab {% if active_role == 'artist' %}active{% endif %}"
+              id="tab-artist"
+              role="tab"
+              aria-selected="{% if active_role == 'artist' %}true{% else %}false{% endif %}">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/>
+          <circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/>
+          <circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/>
+          <circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/>
+          <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.992 6.012 17.488 2 12 2z"/>
+        </svg>
+        <span>Artist / Seller</span>
+      </button>
+    </div>
+
+    <!-- Header Content -->
+    <div class="auth-header">
+      <span class="auth-eyebrow" id="auth-eyebrow">
+        {% if active_role == 'artist' %}Artist & Creator Registration{% else %}Join the Collection{% endif %}
+      </span>
+      <h1 class="auth-title">Create Account</h1>
+      <p class="auth-subtitle" id="auth-subtitle">
+        {% if active_role == 'artist' %}
+          List your paintings, curate exhibitions, and receive direct sales payouts
+        {% else %}
+          Start curating your personal vault and acquire original works
+        {% endif %}
+      </p>
+    </div>
+
+    <form method="post" class="auth-form" id="register-form">
+      {% csrf_token %}
+      
+      <!-- Hidden Role Indicator -->
+      <input type="hidden" name="role" id="auth-role-input" value="{{ active_role|default:'user' }}">
+
+      <div class="form-group">
+        <label for="name" id="name-label">
+          {% if active_role == 'artist' %}Artist or Studio Name{% else %}Full Name{% endif %}
+        </label>
+        <div class="input-icon-wrap">
+          <span class="field-icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+          </span>
+          <input type="text" id="name" name="name" required value="{{ name|default:'' }}"
+                 placeholder="{% if active_role == 'artist' %}e.g. Maya Lin or Studio Saffron{% else %}Your full name{% endif %}"
+                 autocomplete="name">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <div class="input-icon-wrap">
+          <span class="field-icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+              <polyline points="22,6 12,13 2,6"/>
+            </svg>
+          </span>
+          <input type="email" id="email" name="email" required value="{{ email|default:'' }}"
+                 placeholder="you@example.com" autocomplete="email">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <div class="input-icon-wrap has-toggle">
+          <span class="field-icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+          </span>
+          <input type="password" id="password" name="password" required
+                 placeholder="At least 8 characters" autocomplete="new-password">
+          <button type="button" class="field-toggle-pwd" data-toggle-target="#password" aria-label="Show password" title="Show password">
+            <svg class="eye-show" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+            <svg class="eye-hide" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:none;">
+              <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+              <line x1="1" y1="1" x2="23" y2="23"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="confirm">Confirm Password</label>
+        <div class="input-icon-wrap has-toggle">
+          <span class="field-icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              <polyline points="9 12 11 14 15 10"/>
+            </svg>
+          </span>
+          <input type="password" id="confirm" name="confirm" required
+                 placeholder="Repeat password" autocomplete="new-password">
+          <button type="button" class="field-toggle-pwd" data-toggle-target="#confirm" aria-label="Show password" title="Show password">
+            <svg class="eye-show" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+            <svg class="eye-hide" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:none;">
+              <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+              <line x1="1" y1="1" x2="23" y2="23"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Artist-specific fields -->
+      <div id="artist-extra-fields" {% if active_role != 'artist' %}style="display: none;"{% endif %}>
+        <div class="form-group" style="margin-bottom: 1.35rem;">
+          <label for="birth_year">Birth Year / Founded (Optional)</label>
+          <div class="input-icon-wrap">
+            <span class="field-icon" aria-hidden="true">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                <line x1="16" y1="2" x2="16" y2="6"/>
+                <line x1="8" y1="2" x2="8" y2="6"/>
+                <line x1="3" y1="10" x2="21" y2="10"/>
+              </svg>
+            </span>
+            <input type="number" id="birth_year" name="birth_year" value="{{ birth_year|default:'' }}"
+                   placeholder="e.g. 1985" min="1900" max="2026">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="bio">Artist Statement / Biography (Optional)</label>
+          <div class="input-icon-wrap">
+            <span class="field-icon textarea-icon" aria-hidden="true">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 20h9"/>
+                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+              </svg>
+            </span>
+            <textarea id="bio" name="bio" rows="3"
+                      placeholder="Brief background on your artistic journey, medium, and movement...">{{ bio|default:'' }}</textarea>
+          </div>
+          <span class="form-field-hint">You can update your bio and upload a portrait anytime from your Artist Studio.</span>
+        </div>
+
+        <div class="payout-policy-note" style="margin-top:1.2rem; margin-bottom:1.5rem; padding:1rem 1.25rem; background:rgba(180,151,90,0.08); border-left:3px solid var(--gold); font-size:0.95rem; line-height:1.55; color:var(--muted);">
+          <strong style="color:var(--gold); font-family:'Cinzel',serif; font-size:0.75rem; display:block; margin-bottom:0.35rem; letter-spacing:0.12em;">REAL-WORLD GALLERY COMMISSION</strong>
+          When collectors acquire your painting on ArtVault, only 5% gallery commission is charged for normal sales (7-8% for exhibition auctions), and the remaining 92-95% is disbursed directly to you.
+        </div>
+      </div>
+
+      <button type="submit" class="btn-auth" id="register-submit-btn">
+        {% if active_role == 'artist' %}Open Artist Studio →{% else %}Create Collector Account{% endif %}
+      </button>
+    </form>
+
+    <p class="auth-switch" id="signin-switch-wrap">
+      Already have an account?
+      <a href="{% url 'accounts:login' %}" id="signin-link" class="hover-underline">Sign in here</a>
+    </p>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+(function() {
+  'use strict';
+  const tabCollector = document.getElementById('tab-collector');
+  const tabArtist = document.getElementById('tab-artist');
+  const roleInput = document.getElementById('auth-role-input');
+  const eyebrow = document.getElementById('auth-eyebrow');
+  const subtitle = document.getElementById('auth-subtitle');
+  const nameLabel = document.getElementById('name-label');
+  const nameInput = document.getElementById('name');
+  const artistExtraFields = document.getElementById('artist-extra-fields');
+  const submitBtn = document.getElementById('register-submit-btn');
+  const signinLink = document.getElementById('signin-link');
+
+  function setRole(role) {
+    if (role === 'artist') {
+      tabArtist.classList.add('active');
+      tabArtist.setAttribute('aria-selected', 'true');
+      tabCollector.classList.remove('active');
+      tabCollector.setAttribute('aria-selected', 'false');
+
+      roleInput.value = 'artist';
+      eyebrow.textContent = 'Artist & Creator Registration';
+      subtitle.textContent = 'List your paintings, curate exhibitions, and receive direct sales payouts';
+      nameLabel.textContent = 'Artist or Studio Name';
+      nameInput.placeholder = 'e.g. Maya Lin or Studio Saffron';
+      artistExtraFields.style.display = 'block';
+      submitBtn.textContent = 'Open Artist Studio →';
+      signinLink.href = "{% url 'accounts:login' %}?role=artist";
+    } else {
+      tabCollector.classList.add('active');
+      tabCollector.setAttribute('aria-selected', 'true');
+      tabArtist.classList.remove('active');
+      tabArtist.setAttribute('aria-selected', 'false');
+
+      roleInput.value = 'user';
+      eyebrow.textContent = 'Join the Collection';
+      subtitle.textContent = 'Start curating your personal vault and acquire original works';
+      nameLabel.textContent = 'Full Name';
+      nameInput.placeholder = 'Your full name';
+      artistExtraFields.style.display = 'none';
+      submitBtn.textContent = 'Create Collector Account';
+      signinLink.href = "{% url 'accounts:login' %}";
+    }
+  }
+
+  if (tabCollector) tabCollector.addEventListener('click', () => setRole('user'));
+  if (tabArtist) tabArtist.addEventListener('click', () => setRole('artist'));
+
+  {% if error and not messages %}
+  function triggerAuthToast() {
+    if (typeof window.showToast === 'function') {
+      window.showToast("{{ error|escapejs }}", "error", 5000);
+    } else {
+      setTimeout(triggerAuthToast, 60);
+    }
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', triggerAuthToast);
+  } else {
+    triggerAuthToast();
+  }
+  {% endif %}
+})();
+</script>
+{% endblock %}

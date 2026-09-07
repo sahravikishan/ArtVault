@@ -1,0 +1,263 @@
+{% extends "base.html" %}
+{% load currency_tags %}
+
+{% block title %}Artist Studio — {{ artist.name }} | ArtVault{% endblock %}
+
+{% block content %}
+<div class="studio-page">
+
+  <!-- ── Studio Header ── -->
+  <div class="studio-header">
+    <div class="studio-header-main">
+      <div class="section-label">
+        <span class="label-dot"></span>
+        Artist Studio &amp; Seller Workspace
+      </div>
+      <h1 class="studio-title">{{ artist.name }}</h1>
+      <p class="studio-subtitle">
+        Curate your gallery portfolio, publish new artworks, and track real-world sales payouts.
+      </p>
+    </div>
+
+    <div class="studio-header-actions">
+      <a href="{% url 'artists:painting_create' %}" class="btn-acquire" style="text-decoration: none;">
+        + Upload New Painting
+      </a>
+      <a href="{% url 'artists:profile_edit' %}" class="btn-studio-secondary" style="display:inline-flex; align-items:center; gap:0.45rem;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+        <span>Profile &amp; Payouts</span>
+      </a>
+      {% if user.collector_profile %}
+        <a href="{% url 'accounts:vault' %}" class="btn-studio-secondary" style="display:inline-flex; align-items:center; gap:0.45rem;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
+          <span>Collector Vault</span>
+        </a>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- ── Financial Metrics Grid ── -->
+  <div class="studio-metrics-grid">
+    <div class="studio-metric-card">
+      <span class="metric-caption">Gross Artwork Sales</span>
+      <span class="metric-value">{{ total_sales_val|inr }}</span>
+      <span class="metric-subtext">{{ orders_count }} piece{{ orders_count|pluralize }} acquired</span>
+    </div>
+
+    <div class="studio-metric-card">
+      <span class="metric-caption">Gallery Commission</span>
+      <span class="metric-value fee-cut">-{{ total_fees|inr }}</span>
+      <span class="metric-subtext">5% normal selling / 7-8% exhibition auction</span>
+    </div>
+
+    <div class="studio-metric-card highlight-gold">
+      <span class="metric-caption">Net Artist Payout</span>
+      <span class="metric-value gold">{{ total_payout|inr }}</span>
+      <span class="metric-subtext">92-95% net revenue disbursed to you</span>
+    </div>
+
+    <div class="studio-metric-card">
+      <span class="metric-caption">Portfolio Works</span>
+      <span class="metric-value">{{ paintings_count }}</span>
+      <span class="metric-subtext">{{ available_count }} available &bull; {{ sold_count }} sold</span>
+    </div>
+  </div>
+
+  <!-- ── Section 1: Artwork Inventory ── -->
+  <section class="studio-section">
+    <div class="studio-section-header">
+      <div>
+        <h2 class="studio-section-title">Your Gallery Inventory</h2>
+        <p class="studio-section-desc">Manage, edit, or view your artworks catalogued in the public ArtVault collection.</p>
+      </div>
+      <a href="{% url 'artists:painting_create' %}" class="btn-auth" style="width: auto; padding: 0.5rem 1.2rem; font-size: 0.72rem; text-decoration: none; margin: 0;">
+        + Add Artwork
+      </a>
+    </div>
+
+    {% if paintings %}
+      <div class="studio-table-wrap">
+        <table class="studio-table">
+          <thead>
+            <tr>
+              <th>Canvas</th>
+              <th>Title</th>
+              <th>Style &amp; Year</th>
+              <th>Asking Price</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for painting in paintings %}
+              <tr>
+                <td style="width: 60px;">
+                  {% if painting.image %}
+                    <img src="{{ painting.image.url }}" alt="{{ painting.title }}" class="studio-painting-thumb">
+                  {% else %}
+                    <div class="studio-thumb-placeholder">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                        <circle cx="8.5" cy="8.5" r="1.5"/>
+                        <polyline points="21 15 16 10 5 21"/>
+                      </svg>
+                    </div>
+                  {% endif %}
+                </td>
+                <td>
+                  <a href="{% url 'paintings:detail' painting.pk %}" class="studio-painting-link" target="_blank">
+                    {{ painting.title }}
+                  </a>
+                </td>
+                <td class="studio-muted">{{ painting.style }} &bull; {{ painting.year_created }}</td>
+                <td class="studio-price">
+                  {% if painting.estimated_value %}
+                    {{ painting.estimated_value|inr }}
+                  {% else %}
+                    <span class="studio-muted">N/A</span>
+                  {% endif %}
+                </td>
+                <td>
+                  {% if painting.is_sold %}
+                    <span class="status-badge status-sold" style="display:inline-flex; align-items:center; gap:0.35rem;">
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
+                        <line x1="7" y1="7" x2="7.01" y2="7"/>
+                      </svg>
+                      <span>Acquired / Sold</span>
+                    </span>
+                  {% else %}
+                    <span class="status-badge status-available" style="display:inline-flex; align-items:center; gap:0.35rem;">
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <polyline points="20 6 9 17 4 12"/>
+                      </svg>
+                      <span>Available</span>
+                    </span>
+                  {% endif %}
+                </td>
+                <td class="studio-actions-cell">
+                  <a href="{% url 'paintings:detail' painting.pk %}" class="studio-action-link" target="_blank" title="View Public Gallery Page">View</a>
+                  <span class="sep">&bull;</span>
+                  <a href="{% url 'artists:painting_edit' painting.pk %}" class="studio-action-link">Edit</a>
+                  {% if not painting.is_sold %}
+                    <span class="sep">&bull;</span>
+                    <a href="{% url 'artists:painting_delete' painting.pk %}" class="studio-action-link text-danger">Delete</a>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="studio-empty-box">
+        <h3>No paintings catalogued yet</h3>
+        <p>You have not listed any artworks yet. Upload your first masterpiece to begin selling to ArtVault collectors.</p>
+        <a href="{% url 'artists:painting_create' %}" class="btn-acquire" style="display: inline-block; margin-top: 1.2rem; text-decoration: none;">
+          + Upload Your First Painting
+        </a>
+      </div>
+    {% endif %}
+  </section>
+
+  <!-- ── Section 2: Sales & Gallery Commission Ledger ── -->
+  <section class="studio-section" style="margin-top: 4rem;">
+    <div class="studio-section-header">
+      <div>
+        <h2 class="studio-section-title">Sales &amp; Commission Ledger</h2>
+        <p class="studio-section-desc">Record of acquired artworks with transparent gallery fee deductions (5% normal selling, 7-8% exhibition auction) and net payouts.</p>
+      </div>
+    </div>
+
+    {% if orders %}
+      <div class="studio-table-wrap">
+        <table class="studio-table">
+          <thead>
+            <tr>
+              <th>Order Ref</th>
+              <th>Acquired Painting</th>
+              <th>Sale Type</th>
+              <th>Collector Name</th>
+              <th>Sale Date</th>
+              <th>Gross Price</th>
+              <th>Gallery Fee</th>
+              <th>Your Net Payout</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for order in orders %}
+              <tr>
+                <td class="mono">#{{ order.pk }}</td>
+                <td>
+                  <strong>{{ order.painting.title }}</strong>
+                </td>
+                <td>
+                  <span class="status-badge {% if order.sale_type == 'exhibition' %}status-sold{% else %}status-available{% endif %}" style="font-size:0.65rem;">
+                    {% if order.sale_type == 'exhibition' %}Exhibition Auction ({{ order.fee_percentage }}%){% else %}Normal Sale ({{ order.fee_percentage }}%){% endif %}
+                  </span>
+                </td>
+                <td>{{ order.buyer_name }}</td>
+                <td class="studio-muted">{{ order.created_at|date:"d M Y" }}</td>
+                <td class="mono">{{ order.amount|inr }}</td>
+                <td class="mono text-danger">-{{ order.gallery_fee|inr }}</td>
+                <td class="mono text-gold" style="font-weight: 600;">{{ order.artist_payout|inr }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="studio-empty-box">
+        <p class="studio-muted">No sales recorded yet. Once a collector acquires your painting via Razorpay, transaction receipts and commission breakdowns will appear here.</p>
+      </div>
+    {% endif %}
+  </section>
+
+  <!-- ── Section 3: Collector Inquiries ── -->
+  {% if inquiries %}
+    <section class="studio-section" style="margin-top: 4rem;">
+      <div class="studio-section-header">
+        <div>
+          <h2 class="studio-section-title">Collector Inquiries &amp; Private Viewings</h2>
+          <p class="studio-section-desc">Direct inquiries regarding provenance, framing, and private viewing appointments.</p>
+        </div>
+      </div>
+
+      <div class="studio-table-wrap">
+        <table class="studio-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Artwork</th>
+              <th>Collector</th>
+              <th>Inquiry Type</th>
+              <th>Message</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for inq in inquiries %}
+              <tr>
+                <td class="studio-muted">{{ inq.created_at|date:"d M Y" }}</td>
+                <td>{{ inq.painting.title }}</td>
+                <td>
+                  <strong>{{ inq.collector_name }}</strong><br>
+                  <small class="studio-muted">{{ inq.collector_email }}{% if inq.collector_phone %} &bull; {{ inq.collector_phone }}{% endif %}</small>
+                </td>
+                <td>{{ inq.get_inquiry_type_display }}</td>
+                <td>{{ inq.message|default:"No specific note provided."|truncatewords:20 }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  {% endif %}
+
+</div>
+{% endblock %}

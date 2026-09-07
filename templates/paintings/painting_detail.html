@@ -15,14 +15,24 @@
     <!-- ── Image Column ── -->
     <div class="detail-image-col gold-frame-full">
       {% if painting.image %}
-        <div class="gold-frame">
-          <!-- Animated border segments -->
+        <div class="gold-frame" id="zoom-container">
           <span class="frame-v-r" aria-hidden="true"></span>
           <span class="frame-v-l" aria-hidden="true"></span>
           <span class="frame-inner" aria-hidden="true"></span>
           <img src="{{ painting.image.url }}"
                alt="{{ painting.title }}"
                id="painting-main-image" />
+          <div class="canvas-magnifier-lens" id="canvas-lens" aria-hidden="true"></div>
+        </div>
+        <div class="inspection-toolbar">
+          <button type="button" class="btn-inspection" id="open-lightbox-btn" style="display:inline-flex; align-items:center; gap:0.45rem;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="11" cy="11" r="8"/>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <span>Full-Screen Curatorial Loupe</span>
+          </button>
+          <span class="inspection-hint">Hover on canvas for instant magnifier</span>
         </div>
       {% else %}
         <div class="image-placeholder-box" id="painting-image-placeholder">
@@ -43,7 +53,6 @@
     <!-- ── Info Column ── -->
     <div class="detail-info" id="painting-info">
 
-      <!-- Section label: Library (gold) -->
       <div class="section-label" style="margin-bottom: 0.5rem;">
         <span class="label-dot"></span>
         {{ painting.style }}
@@ -93,7 +102,6 @@
 
         {% if painting.estimated_value %}
         <div class="meta-item" style="grid-column: 1 / -1;">
-          <!-- Section label: Marketplace (burgundy) for value -->
           <div class="section-label market" style="margin-bottom:0.4rem;">
             <span class="label-dot"></span>
             Estimated Value
@@ -106,6 +114,68 @@
 
       </div><!-- /detail-meta-grid -->
 
+      <!-- ── Acquire & Inquire Section ── -->
+      <div class="acquire-section">
+        <div style="display:flex; gap:1rem; flex-wrap:wrap; align-items:center;">
+          {% if painting.estimated_value %}
+            <button class="btn-acquire" id="acquire-btn"
+                    data-painting-pk="{{ painting.pk }}"
+                    data-amount="{{ painting.estimated_value }}"
+                    data-title="{{ painting.title }}">
+              Acquire This Work
+            </button>
+          {% endif %}
+
+          <button class="btn-acquire" id="inquire-btn"
+                  style="background:transparent; border:1px solid var(--border); color:var(--text); display:inline-flex; align-items:center; justify-content:center; gap:0.45rem;"
+                  title="Request Private Viewing or Condition Report">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="2" y1="20" x2="22" y2="20"/>
+              <path d="M12 2L2 7h20L12 2z"/>
+              <line x1="5" y1="7" x2="5" y2="20"/>
+              <line x1="9.5" y1="7" x2="9.5" y2="20"/>
+              <line x1="14.5" y1="7" x2="14.5" y2="20"/>
+              <line x1="19" y1="7" x2="19" y2="20"/>
+            </svg>
+            <span>Inquire / Private Viewing</span>
+          </button>
+
+          {% if user.is_authenticated %}
+            <button class="btn-favourite {% if is_favourite %}active{% endif %}"
+                    id="fav-btn"
+                    data-url="{% url 'accounts:toggle_favourite' painting.pk %}"
+                    aria-label="Save to vault">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="{% if is_favourite %}currentColor{% else %}none{% endif %}"
+                   stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+              </svg>
+              <span class="fav-label">{% if is_favourite %}Saved to Vault{% else %}Save to Vault{% endif %}</span>
+            </button>
+          {% else %}
+            <a href="{% url 'accounts:login' %}" class="btn-favourite">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                   stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+              </svg>
+              <span class="fav-label">Sign in to Save</span>
+            </a>
+          {% endif %}
+        </div>
+
+        <p class="acquire-note">Private acquisition directly through ArtVault Concierge &bull; Razorpay Secure</p>
+      </div>
+
+      {% if painting.exhibitions.all %}
+        <div style="margin-top:2rem; padding:1.2rem 1.4rem; background:rgba(180,151,90,0.06); border-left:3px solid var(--gold);">
+          <span style="font-family:'Cinzel',serif; font-size:0.7rem; letter-spacing:0.2em; text-transform:uppercase; color:var(--gold); display:block; margin-bottom:0.35rem;">Conserved & Presented In</span>
+          {% for exh in painting.exhibitions.all %}
+            <a href="{% url 'paintings:exhibition_detail' exh.slug %}" style="color:var(--text); font-weight:600; text-decoration:none;">
+              Exhibition: {{ exh.title }} &rarr;
+            </a>
+          {% endfor %}
+        </div>
+      {% endif %}
+
       {% if painting.story %}
         <hr class="detail-divider" />
         <div class="detail-story" id="painting-story">
@@ -117,4 +187,546 @@
     </div><!-- /detail-info -->
   </div><!-- /detail-layout -->
 
+
+  <!-- ══════════════════════════════════════════════════
+       Acquire Modal — Buyer Details Form
+  ══════════════════════════════════════════════════ -->
+  <div class="modal-overlay" id="acquire-modal" aria-modal="true" role="dialog" aria-labelledby="modal-title">
+    <div class="modal-box">
+      <button class="modal-close" id="modal-close-btn" aria-label="Close">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+
+      <div class="modal-header">
+        <p class="modal-eyebrow">Acquiring</p>
+        <h2 class="modal-title" id="modal-title">{{ painting.title }}</h2>
+        <p class="modal-price">{{ painting.estimated_value|inr }}</p>
+      </div>
+
+      <form class="modal-form" id="buyer-form" novalidate>
+        {% csrf_token %}
+        <div class="form-group">
+          <label for="buyer-name">Full Name</label>
+          <input type="text" id="buyer-name" name="name" required
+                 placeholder="Your full name" autocomplete="name">
+        </div>
+        <div class="form-group">
+          <label for="buyer-email">Email Address</label>
+          <input type="email" id="buyer-email" name="email" required
+                 placeholder="you@example.com" autocomplete="email">
+        </div>
+        <div class="form-group">
+          <label for="buyer-phone">Phone Number</label>
+          <input type="tel" id="buyer-phone" name="phone" required
+                 placeholder="+91 98765 43210" autocomplete="tel">
+        </div>
+        <p class="form-error" id="form-error" hidden></p>
+        <button type="submit" class="btn-modal-pay" id="pay-btn">
+          Proceed to Payment
+        </button>
+      </form>
+
+      <p class="modal-footer-note" style="display:flex; align-items:center; justify-content:center; gap:0.4rem;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+        <span>Payments are processed securely by Razorpay. ArtVault does not store card details.</span>
+      </p>
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════════
+       Inquire Modal — Private Viewing & Concierge Form
+  ══════════════════════════════════════════════════ -->
+  <div class="modal-overlay" id="inquire-modal" aria-modal="true" role="dialog" aria-labelledby="inquire-modal-title">
+    <div class="modal-box">
+      <button class="modal-close" id="inquire-modal-close-btn" aria-label="Close">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+
+      <div class="modal-header">
+        <p class="modal-eyebrow">Private Viewing & Curatorial Concierge</p>
+        <h2 class="modal-title" id="inquire-modal-title">{{ painting.title }}</h2>
+        <p class="modal-price">by {{ painting.artist.name }}</p>
+      </div>
+
+      <div id="inquire-success-msg" style="display:none; text-align:center; padding:1.5rem 0;">
+        <p style="font-size:1.8rem; color:var(--gold); margin-bottom:0.5rem;">✦</p>
+        <h3 style="font-family:'Cinzel',serif; font-size:1.3rem; margin-bottom:0.75rem;">Inquiry Received</h3>
+        <p id="inquire-success-text" style="font-size:1.1rem; line-height:1.6; color:var(--muted);"></p>
+        <button type="button" class="btn-back-collection" id="inquire-done-btn" style="margin-top:1.5rem; cursor:pointer;">Close Window</button>
+      </div>
+
+      <form class="modal-form" id="inquire-form" novalidate>
+        <div class="form-group">
+          <label for="inq-name">Your Full Name</label>
+          <input type="text" id="inq-name" name="name" required placeholder="Full Name" value="{{ user.get_full_name|default:'' }}">
+        </div>
+
+        <div class="form-group">
+          <label for="inq-email">Email Address</label>
+          <input type="email" id="inq-email" name="email" required placeholder="collector@example.com" value="{{ user.email|default:'' }}">
+        </div>
+
+        <div class="form-group">
+          <label for="inq-phone">Telephone / Mobile</label>
+          <input type="tel" id="inq-phone" name="phone" placeholder="+91 98765 43210">
+        </div>
+
+        <div class="form-group">
+          <label for="inq-type">Nature of Inquiry</label>
+          <select id="inq-type" name="inquiry_type" style="font-family:'Cormorant Garamond',serif; font-size:1.1rem; padding:0.75rem 1rem; border:1px solid var(--border); background:var(--bg); color:var(--text); outline:none;">
+            <option value="private_viewing">Private In-Person Gallery Viewing</option>
+            <option value="condition_report">Formal Provenance & Condition Report</option>
+            <option value="acquisition_inquiry">Confidential Curatorial Acquisition</option>
+            <option value="other">General Curatorial Question</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="inq-date">Preferred Date (Optional)</label>
+          <input type="date" id="inq-date" name="preferred_date" style="font-family:'Cormorant Garamond',serif; font-size:1.1rem; padding:0.75rem 1rem; border:1px solid var(--border); background:var(--bg); color:var(--text); outline:none;">
+        </div>
+
+        <div class="form-group">
+          <label for="inq-message">Specific Inquiries or Requests</label>
+          <textarea id="inq-message" name="message" rows="3" placeholder="Please specify any questions regarding provenance, framing, or viewing arrangements..." style="font-family:'Cormorant Garamond',serif; font-size:1.1rem; padding:0.75rem 1rem; border:1px solid var(--border); background:var(--bg); color:var(--text); outline:none; resize:vertical;"></textarea>
+        </div>
+
+        <p class="form-error" id="inquire-form-error" hidden></p>
+
+        <button type="submit" class="btn-modal-pay" id="inquire-submit-btn">
+          Transmit Inquiry to Curator
+        </button>
+      </form>
+
+      <p class="modal-footer-note">
+        All inquiries are treated with curatorial discretion and collector confidentiality.
+      </p>
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════════
+       Full-Screen Artwork Inspection Lightbox
+  ══════════════════════════════════════════════════ -->
+  {% if painting.image %}
+  <div class="lightbox-overlay" id="inspection-lightbox" aria-modal="true" role="dialog" aria-hidden="true">
+    <div class="lightbox-header">
+      <div class="lightbox-title-wrap">
+        <h3 class="lightbox-painting-title">{{ painting.title }}</h3>
+        <p class="lightbox-artist-name">by {{ painting.artist.name }} &bull; High-Resolution Curatorial Inspection</p>
+      </div>
+      <div class="lightbox-controls">
+        <button type="button" class="btn-lightbox-ctrl" id="zoom-in-btn" title="Zoom In">+</button>
+        <button type="button" class="btn-lightbox-ctrl" id="zoom-out-btn" title="Zoom Out">&minus;</button>
+        <button type="button" class="btn-lightbox-ctrl" id="zoom-reset-btn" title="Reset Scale">Reset</button>
+        <button type="button" class="btn-lightbox-ctrl close-btn" id="close-lightbox-btn" title="Close Lightbox" style="display:inline-flex; align-items:center; justify-content:center;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="lightbox-viewport" id="lightbox-viewport">
+      <img src="{{ painting.image.url }}" alt="{{ painting.title }}" class="lightbox-canvas-img" id="lightbox-img" draggable="false" />
+    </div>
+    <p class="lightbox-footer-tip">Drag canvas to pan &bull; Click + / &minus; to magnify brush strokes</p>
+  </div>
+  {% endif %}
+
+{% endblock %}
+
+
+{% block extra_head %}
+<!-- Razorpay Checkout JS (official SDK) -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+{% endblock %}
+
+
+{% block extra_scripts %}
+<script>
+(function () {
+  'use strict';
+
+  const RAZORPAY_KEY = '{{ razorpay_key_id }}';
+  const INITIATE_URL = '{% url "paintings:initiate_payment" painting.pk %}';
+  const VERIFY_URL   = '{% url "paintings:verify_payment" %}';
+  const CSRF_TOKEN   = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+  const acquireBtn  = document.getElementById('acquire-btn');
+  const modal       = document.getElementById('acquire-modal');
+  const closeBtn    = document.getElementById('modal-close-btn');
+  const buyerForm   = document.getElementById('buyer-form');
+  const payBtn      = document.getElementById('pay-btn');
+  const formError   = document.getElementById('form-error');
+
+  // Open modal
+  if (acquireBtn) {
+    acquireBtn.addEventListener('click', () => {
+      modal.classList.add('open');
+      document.body.classList.add('modal-open');
+    });
+  }
+
+  // Close modal
+  function closeModal() {
+    modal.classList.remove('open');
+    document.body.classList.remove('modal-open');
+  }
+  closeBtn.addEventListener('click', closeModal);
+  modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+
+  // Show error
+  function showError(msg) {
+    if (window.showToast) {
+      window.showToast(msg, 'error', 5000);
+    }
+    if (formError) {
+      formError.textContent = msg;
+      formError.hidden = false;
+    }
+  }
+  function clearError() {
+    formError.textContent = '';
+    formError.hidden = true;
+  }
+
+  // Form submit → initiate payment → open Razorpay popup
+  buyerForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    clearError();
+
+    const name  = document.getElementById('buyer-name').value.trim();
+    const email = document.getElementById('buyer-email').value.trim();
+    const phone = document.getElementById('buyer-phone').value.trim();
+
+    if (!name || !email || !phone) {
+      showError('Please fill in all fields before proceeding.');
+      return;
+    }
+
+    payBtn.disabled = true;
+    payBtn.textContent = 'Creating order…';
+
+    try {
+      // Step 1: Create Razorpay order on the server
+      const resp = await fetch(INITIATE_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': CSRF_TOKEN,
+        },
+        body: JSON.stringify({ name, email, phone }),
+      });
+
+      const data = await resp.json();
+      if (!resp.ok) { showError(data.error || 'Could not create order.'); return; }
+
+      // Step 2: Open Razorpay checkout popup
+      const options = {
+        key:         RAZORPAY_KEY,
+        amount:      data.amount,
+        currency:    data.currency,
+        name:        'ArtVault',
+        description: data.painting_title,
+        order_id:    data.order_id,
+        prefill: {
+          name:    data.buyer_name,
+          email:   data.buyer_email,
+          contact: data.buyer_phone,
+        },
+        theme: { color: '#B4975A' },
+
+        handler: async function (response) {
+          // Step 3: Verify signature on the server
+          const verifyResp = await fetch(VERIFY_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              razorpay_order_id:   response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature:  response.razorpay_signature,
+            }),
+          });
+          const verifyData = await verifyResp.json();
+          if (verifyData.status === 'ok') {
+            window.location.href = verifyData.redirect;
+          } else {
+            showError('Payment verification failed. Please contact support.');
+          }
+        },
+
+        modal: {
+          ondismiss: function () {
+            payBtn.disabled = false;
+            payBtn.textContent = 'Proceed to Payment';
+          },
+        },
+      };
+
+      const rzp = new Razorpay(options);
+      rzp.on('payment.failed', function (resp) {
+        showError('Payment failed: ' + resp.error.description);
+        payBtn.disabled = false;
+        payBtn.textContent = 'Proceed to Payment';
+      });
+      rzp.open();
+
+    } catch (err) {
+      showError('A network error occurred. Please try again.');
+      console.error(err);
+    } finally {
+      if (!payBtn.disabled) {
+        payBtn.disabled = false;
+        payBtn.textContent = 'Proceed to Payment';
+      }
+    }
+  });
+
+  // ── Heart / Favourite toggle ──────────────────────────────────
+  const favBtn = document.getElementById('fav-btn');
+  if (favBtn) {
+    favBtn.addEventListener('click', async () => {
+      const url    = favBtn.dataset.url;
+      const heart  = favBtn.querySelector('path');
+      const label  = favBtn.querySelector('.fav-label');
+      try {
+        const resp = await fetch(url, {
+          method: 'POST',
+          headers: { 'X-CSRFToken': CSRF_TOKEN },
+        });
+        const data = await resp.json();
+        if (data.status === 'saved') {
+          favBtn.classList.add('active');
+          heart.setAttribute('fill', 'currentColor');
+          label.textContent = 'Saved to Vault';
+          if (window.showToast) window.showToast('Artwork saved to your vault.', 'success', 5000);
+        } else {
+          favBtn.classList.remove('active');
+          heart.setAttribute('fill', 'none');
+          label.textContent = 'Save to Vault';
+          if (window.showToast) window.showToast('Artwork removed from your vault.', 'info', 5000);
+        }
+      } catch (e) { console.error('Favourite toggle failed', e); }
+    });
+  }
+
+  // ── Curatorial Inquiry & Private Viewing Modal ─────────────────
+  const INQUIRE_URL = '{% url "paintings:inquire" painting.pk %}';
+  const inqBtn = document.getElementById('inquire-btn');
+  const inqModal = document.getElementById('inquire-modal');
+  const inqCloseBtn = document.getElementById('inquire-modal-close-btn');
+  const inqDoneBtn = document.getElementById('inquire-done-btn');
+  const inqForm = document.getElementById('inquire-form');
+  const inqError = document.getElementById('inquire-form-error');
+  const inqSuccessMsg = document.getElementById('inquire-success-msg');
+  const inqSuccessText = document.getElementById('inquire-success-text');
+  const inqSubmitBtn = document.getElementById('inquire-submit-btn');
+
+  function openInqModal() {
+    if (inqModal) {
+      inqModal.classList.add('open');
+      document.body.classList.add('modal-open');
+    }
+  }
+
+  function closeInqModal() {
+    if (inqModal) {
+      inqModal.classList.remove('open');
+      document.body.classList.remove('modal-open');
+    }
+  }
+
+  if (inqBtn) inqBtn.addEventListener('click', openInqModal);
+  if (inqCloseBtn) inqCloseBtn.addEventListener('click', closeInqModal);
+  if (inqDoneBtn) inqDoneBtn.addEventListener('click', closeInqModal);
+  if (inqModal) {
+    inqModal.addEventListener('click', (e) => { if (e.target === inqModal) closeInqModal(); });
+  }
+
+  if (inqForm) {
+    inqForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      inqError.hidden = true;
+      inqError.textContent = '';
+
+      const name = document.getElementById('inq-name').value.trim();
+      const email = document.getElementById('inq-email').value.trim();
+      const phone = document.getElementById('inq-phone').value.trim();
+      const inquiry_type = document.getElementById('inq-type').value;
+      const preferred_date = document.getElementById('inq-date').value;
+      const message = document.getElementById('inq-message').value.trim();
+
+      if (!name || !email) {
+        inqError.textContent = 'Please provide both your name and email address.';
+        inqError.hidden = false;
+        return;
+      }
+
+      inqSubmitBtn.disabled = true;
+      inqSubmitBtn.textContent = 'Transmitting to Curator…';
+
+      try {
+        const resp = await fetch(INQUIRE_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': CSRF_TOKEN,
+          },
+          body: JSON.stringify({ name, email, phone, inquiry_type, preferred_date, message }),
+        });
+        const data = await resp.json();
+        if (resp.ok && data.status === 'success') {
+          inqForm.style.display = 'none';
+          inqSuccessText.textContent = data.message;
+          inqSuccessMsg.style.display = 'block';
+          if (window.showToast) window.showToast(data.message, 'success', 5000);
+        } else {
+          const errMsg = data.error || 'Failed to submit inquiry.';
+          inqError.textContent = errMsg;
+          inqError.hidden = false;
+          if (window.showToast) window.showToast(errMsg, 'error', 5000);
+          inqSubmitBtn.disabled = false;
+          inqSubmitBtn.textContent = 'Transmit Inquiry to Curator';
+        }
+      } catch (err) {
+        const errMsg = 'A network error occurred. Please try again.';
+        inqError.textContent = errMsg;
+        inqError.hidden = false;
+        if (window.showToast) window.showToast(errMsg, 'error', 5000);
+        inqSubmitBtn.disabled = false;
+        inqSubmitBtn.textContent = 'Transmit Inquiry to Curator';
+      }
+    });
+  }
+
+  // ── High-Resolution Canvas Magnifier Lens ──────────────────────
+  const zoomContainer = document.getElementById('zoom-container');
+  const mainImage = document.getElementById('painting-main-image');
+  const lens = document.getElementById('canvas-lens');
+
+  if (zoomContainer && mainImage && lens) {
+    const ZOOM_LEVEL = 2.5;
+
+    zoomContainer.addEventListener('mouseenter', () => {
+      lens.style.display = 'block';
+      lens.style.backgroundImage = `url("${mainImage.src}")`;
+      lens.style.backgroundSize = `${mainImage.offsetWidth * ZOOM_LEVEL}px ${mainImage.offsetHeight * ZOOM_LEVEL}px`;
+    });
+
+    zoomContainer.addEventListener('mouseleave', () => {
+      lens.style.display = 'none';
+    });
+
+    zoomContainer.addEventListener('mousemove', (e) => {
+      const rect = mainImage.getBoundingClientRect();
+      let x = e.clientX - rect.left;
+      let y = e.clientY - rect.top;
+
+      x = Math.max(0, Math.min(x, rect.width));
+      y = Math.max(0, Math.min(y, rect.height));
+
+      const lensW = lens.offsetWidth / 2;
+      const lensH = lens.offsetHeight / 2;
+
+      lens.style.left = `${x - lensW}px`;
+      lens.style.top = `${y - lensH}px`;
+
+      const bgX = (x * ZOOM_LEVEL) - lensW;
+      const bgY = (y * ZOOM_LEVEL) - lensH;
+      lens.style.backgroundPosition = `-${bgX}px -${bgY}px`;
+    });
+  }
+
+  // ── Full-Screen Curatorial Lightbox ─────────────────────────────
+  const openLightboxBtn = document.getElementById('open-lightbox-btn');
+  const lightbox = document.getElementById('inspection-lightbox');
+  const closeLightboxBtn = document.getElementById('close-lightbox-btn');
+  const lightboxImg = document.getElementById('lightbox-img');
+  const lightboxViewport = document.getElementById('lightbox-viewport');
+  const zoomInBtn = document.getElementById('zoom-in-btn');
+  const zoomOutBtn = document.getElementById('zoom-out-btn');
+  const zoomResetBtn = document.getElementById('zoom-reset-btn');
+
+  let currentScale = 1;
+  let panX = 0;
+  let panY = 0;
+  let isDragging = false;
+  let startX = 0;
+  let startY = 0;
+
+  function updateTransform() {
+    if (lightboxImg) {
+      lightboxImg.style.transform = `translate(${panX}px, ${panY}px) scale(${currentScale})`;
+    }
+  }
+
+  function resetZoom() {
+    currentScale = 1;
+    panX = 0;
+    panY = 0;
+    updateTransform();
+  }
+
+  if (openLightboxBtn && lightbox) {
+    openLightboxBtn.addEventListener('click', () => {
+      resetZoom();
+      lightbox.classList.add('open');
+      document.body.classList.add('modal-open');
+    });
+
+    function closeLightbox() {
+      lightbox.classList.remove('open');
+      document.body.classList.remove('modal-open');
+    }
+
+    if (closeLightboxBtn) closeLightboxBtn.addEventListener('click', closeLightbox);
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && lightbox.classList.contains('open')) {
+        closeLightbox();
+      }
+    });
+
+    if (zoomInBtn) {
+      zoomInBtn.addEventListener('click', () => {
+        currentScale = Math.min(4, currentScale + 0.35);
+        updateTransform();
+      });
+    }
+
+    if (zoomOutBtn) {
+      zoomOutBtn.addEventListener('click', () => {
+        currentScale = Math.max(0.6, currentScale - 0.35);
+        updateTransform();
+      });
+    }
+
+    if (zoomResetBtn) zoomResetBtn.addEventListener('click', resetZoom);
+
+    if (lightboxViewport) {
+      lightboxViewport.addEventListener('mousedown', (e) => {
+        if (e.target === closeLightboxBtn || e.target.closest('.lightbox-header')) return;
+        isDragging = true;
+        startX = e.clientX - panX;
+        startY = e.clientY - panY;
+      });
+
+      window.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        panX = e.clientX - startX;
+        panY = e.clientY - startY;
+        updateTransform();
+      });
+
+      window.addEventListener('mouseup', () => {
+        isDragging = false;
+      });
+    }
+  }
+
+})();
+</script>
 {% endblock %}

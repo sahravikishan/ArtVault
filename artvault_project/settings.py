@@ -12,7 +12,7 @@ SECRET_KEY = 'django-insecure-artvault-secret-key-change-in-production-2024'
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'testserver', '*']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -23,6 +23,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'artists',
     'paintings',
+    'accounts',
 ]
 
 MIDDLEWARE = [
@@ -70,19 +71,35 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'UTC'
+TIME_ZONE     = 'Asia/Kolkata'   # IST
 USE_I18N = True
-USE_TZ = True
+USE_TZ   = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 
-MEDIA_URL = '/media/'
+MEDIA_URL  = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Payment Gateway Setup (Placeholder for future Marketplace phase)
-# Using Razorpay for UPI, Netbanking, and Cards in India.
-RAZORPAY_KEY_ID = os.environ.get('RAZORPAY_KEY_ID', 'rzp_test_placeholder_key')
+# ── Payment Gateway (Razorpay) ────────────────────────────────────
+RAZORPAY_KEY_ID     = os.environ.get('RAZORPAY_KEY_ID',     'rzp_test_placeholder_key')
 RAZORPAY_KEY_SECRET = os.environ.get('RAZORPAY_KEY_SECRET', 'placeholder_secret')
+
+# ── Email Configuration ───────────────────────────────────────────
+# In development, emails are printed to the terminal console.
+# For production, switch to SMTP by setting EMAIL_BACKEND to
+#   'django.core.mail.backends.smtp.EmailBackend'
+# and supply the env vars below.
+EMAIL_BACKEND = os.environ.get(
+    'EMAIL_BACKEND',
+    'django.core.mail.backends.console.EmailBackend'   # dev default
+)
+EMAIL_HOST          = os.environ.get('EMAIL_HOST',          'smtp.gmail.com')
+EMAIL_PORT          = int(os.environ.get('EMAIL_PORT',      '587'))
+EMAIL_USE_TLS       = True
+EMAIL_HOST_USER     = os.environ.get('EMAIL_HOST_USER',     '')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+DEFAULT_FROM_EMAIL  = os.environ.get('DEFAULT_FROM_EMAIL',  'ArtVault <noreply@artvault.in>')
+ARTVAULT_ADMIN_EMAIL = os.environ.get('ARTVAULT_ADMIN_EMAIL', EMAIL_HOST_USER)

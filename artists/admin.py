@@ -1,9 +1,3 @@
 from django.contrib import admin
-from .models import Artist
-
-
-@admin.register(Artist)
-class ArtistAdmin(admin.ModelAdmin):
-    list_display = ('name', 'birth_year')
-    search_fields = ('name', 'bio')
-    list_filter = ('birth_year',)
+# Artist is now registered in paintings/admin.py with a richer configuration
+# (image preview, photo upload, painting count column).

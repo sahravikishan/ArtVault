@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}Artists — ArtVault Directory{% endblock %}
+{% block meta_description %}Explore the celebrated artists whose masterpieces are archived within the private ArtVault collection.{% endblock %}
+
+{% block content %}
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="section-label">
+      <span class="label-dot"></span>
+      Directory
+    </div>
+    <h1>The Masters & Artists</h1>
+    <p class="subtitle">Biographical archives and authenticated catalogues of artists represented in the vault.</p>
+  </div>
+
+  <!-- Artist Cards Grid -->
+  {% if artists %}
+    <div class="artists-grid">
+      {% for artist in artists %}
+        <article class="artist-card">
+          <div class="artist-card-media">
+            {% if artist.photo %}
+              <img src="{{ artist.photo.url }}" alt="{{ artist.name }}" class="artist-card-img" />
+            {% else %}
+              <div class="artist-card-placeholder">
+                <span>{{ artist.name|slice:":1" }}</span>
+              </div>
+            {% endif %}
+          </div>
+
+          <div class="artist-card-content">
+            <span class="artist-card-era">
+              {% if artist.birth_year %}Born {{ artist.birth_year }}{% else %}ArtVault Master{% endif %}
+            </span>
+            <h2 class="artist-card-name">
+              <a href="{% url 'artists:detail' artist.pk %}">{{ artist.name }}</a>
+            </h2>
+
+            {% if artist.bio %}
+              <p class="artist-card-bio">{{ artist.bio|truncatewords:26 }}</p>
+            {% endif %}
+
+            <div class="artist-card-footer">
+              <span class="artist-works-pill">
+                {{ artist.works_count }} work{{ artist.works_count|pluralize }} archived
+              </span>
+              <a href="{% url 'artists:detail' artist.pk %}" class="artist-view-link">
+                View Portfolio →
+              </a>
+            </div>
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <h3>No artists catalogued yet</h3>
+      <p>The ArtVault curatorial registry is currently curating master artist archives. Please check back shortly.</p>
+    </div>
+  {% endif %}
+
+{% endblock %}

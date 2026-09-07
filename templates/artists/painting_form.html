@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}{{ action }} — Artist Studio | ArtVault{% endblock %}
+
+{% block content %}
+<div class="auth-page" style="min-height: auto; padding: 2rem 1rem 5rem;">
+  <div class="auth-card" style="max-width: 680px;">
+
+    <a href="{% url 'artists:dashboard' %}" class="back-link" style="margin-bottom: 1.5rem; display: inline-block;">
+      ← Back to Artist Studio
+    </a>
+
+    <div class="auth-header" style="text-align: left; margin-bottom: 2rem;">
+      <span class="auth-eyebrow">Artist Studio Inventory</span>
+      <h1 class="auth-title">{{ action }}</h1>
+      <p class="auth-subtitle">Publish or update your original artwork in the ArtVault permanent collection.</p>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" class="auth-form">
+      {% csrf_token %}
+
+      <div class="form-group">
+        <label for="title">Artwork Title *</label>
+        <input type="text" id="title" name="title" required
+               placeholder="e.g. Solitude at Dusk" value="{{ painting.title|default:'' }}">
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem;">
+        <div class="form-group">
+          <label for="style">Artistic Style / Movement</label>
+          <select id="style" name="style" style="font-family:'Cormorant Garamond',serif; font-size:1.1rem; padding:0.75rem 1rem; border:1px solid var(--border); background:var(--bg); color:var(--text); outline:none;">
+            {% for s_val, s_label in styles %}
+              <option value="{{ s_val }}" {% if painting.style == s_val %}selected{% endif %}>{{ s_label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="year_created">Year of Creation *</label>
+          <input type="number" id="year_created" name="year_created" required
+                 placeholder="e.g. 2024" min="1900" max="2026" value="{{ painting.year_created|default:'2024' }}">
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem;">
+        <div class="form-group">
+          <label for="materials">Medium &amp; Materials</label>
+          <input type="text" id="materials" name="materials"
+                 placeholder="e.g. Oil on Belgian linen" value="{{ painting.materials|default:'' }}">
+        </div>
+
+        <div class="form-group">
+          <label for="dimensions">Dimensions</label>
+          <input type="text" id="dimensions" name="dimensions"
+                 placeholder="e.g. 90 x 120 cm (35 x 47 in)" value="{{ painting.dimensions|default:'' }}">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="estimated_value">Asking Price / Estimated Value (INR ₹)</label>
+        <input type="number" step="0.01" id="estimated_value" name="estimated_value"
+               placeholder="e.g. 75000" value="{{ painting.estimated_value|default:'' }}">
+        <span class="form-field-hint">
+          Only 5% gallery fee is charged for normal selling (7-8% for exhibition auction sales). You receive 92-95% net payout upon acquisition.
+        </span>
+      </div>
+
+      <div class="form-group">
+        <label for="story">Curatorial Story &amp; Inspiration</label>
+        <textarea id="story" name="story" rows="4"
+                  placeholder="Share the philosophical context, inspiration, and technique behind this piece...">{{ painting.story|default:'' }}</textarea>
+      </div>
+
+      <!-- Image Upload & Preview -->
+      <div class="form-group">
+        <label for="image">High-Resolution Canvas Photograph</label>
+        {% if painting.image %}
+          <div style="margin-bottom: 0.75rem; display: flex; align-items: center; gap: 1rem;">
+            <img src="{{ painting.image.url }}" alt="{{ painting.title }}" style="width: 80px; height: 80px; object-fit: cover; border: 1px solid var(--border);">
+            <span class="studio-muted" style="font-size: 0.95rem;">Current photograph. Uploading a new file will replace this.</span>
+          </div>
+        {% endif %}
+        <input type="file" id="image" name="image" accept="image/*"
+               style="font-family:'Cormorant Garamond',serif; padding: 0.5rem 0;">
+      </div>
+
+      <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+        <button type="submit" class="btn-acquire" style="flex: 1; border: none; cursor: pointer;">
+          {{ action }}
+        </button>
+        <a href="{% url 'artists:dashboard' %}" class="btn-studio-secondary" style="text-decoration: none; padding: 0.85rem 1.5rem;">
+          Cancel
+        </a>
+      </div>
+
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+{% if error and not messages %}
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    if (window.showToast) {
+      window.showToast("{{ error|escapejs }}", "error", 5000);
+    }
+  });
+</script>
+{% endif %}
+{% endblock %}

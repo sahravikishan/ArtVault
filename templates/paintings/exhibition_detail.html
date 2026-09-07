@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+{% load currency_tags %}
+
+{% block title %}{{ exhibition.title }} — ArtVault Curated Exhibition{% endblock %}
+{% block meta_description %}{{ exhibition.title }}. {{ exhibition.curator_statement|truncatewords:25 }}{% endblock %}
+
+{% block content %}
+
+  <div class="artist-nav-breadcrumbs">
+    <a href="{% url 'paintings:exhibition_list' %}" class="back-link">
+      ← Back to Curated Exhibitions
+    </a>
+    <span class="breadcrumb-separator">/</span>
+    <a href="{% url 'paintings:home' %}" class="back-link">
+      Collection
+    </a>
+  </div>
+
+  <!-- ── Exhibition Curatorial Hero ── -->
+  <header class="exhibition-detail-hero">
+    
+    <div class="section-label">
+      <span class="label-dot"></span>
+      Special Curatorial Presentation
+    </div>
+
+    {% if exhibition.subtitle %}
+      <p class="exhibition-hero-eyebrow">{{ exhibition.subtitle }}</p>
+    {% endif %}
+
+    <h1 class="exhibition-hero-title">{{ exhibition.title }}</h1>
+
+    <div class="exhibition-hero-meta">
+      <div class="meta-pill">
+        <span class="pill-label">Timeline</span>
+        <span class="pill-val">
+          {% if exhibition.start_date %}
+            {{ exhibition.start_date|date:"F Y" }} &mdash; {% if exhibition.end_date %}{{ exhibition.end_date|date:"F Y" }}{% else %}Permanent Presentation{% endif %}
+          {% else %}
+            Permanent Presentation
+          {% endif %}
+        </span>
+      </div>
+
+      <div class="meta-pill">
+        <span class="pill-label">Curator</span>
+        <span class="pill-val">{{ exhibition.curator_name }}</span>
+      </div>
+
+      <div class="meta-pill">
+        <span class="pill-label">Works on Display</span>
+        <span class="pill-val">{{ paintings|length }} Pieces</span>
+      </div>
+
+      <div class="meta-pill">
+        <span class="pill-label">Masters Represented</span>
+        <span class="pill-val">{{ artists|length }} Artists</span>
+      </div>
+    </div>
+
+    <!-- Curatorial Statement -->
+    <div class="exhibition-curator-essay">
+      <h3 class="essay-heading">Curatorial Statement & Dialogue</h3>
+      <div class="essay-body">
+        <p>{{ exhibition.curator_statement|linebreaks }}</p>
+      </div>
+    </div>
+
+    <!-- Artists Represented Bar -->
+    {% if artists %}
+      <div class="exhibition-artists-bar">
+        <span class="artists-bar-label">Featured Masters:</span>
+        <div class="artists-bar-list">
+          {% for a in artists %}
+            <a href="{% url 'artists:detail' a.pk %}" class="exh-artist-tag">
+              {{ a.name }}
+            </a>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+
+  </header>
+
+  <!-- ── Exhibition Gallery ── -->
+  <section class="exhibition-gallery-section">
+    <div class="portfolio-header">
+      <div class="portfolio-header-content">
+        <span class="portfolio-eyebrow">Works in Exhibition</span>
+        <h2 class="portfolio-title">The Curated Works</h2>
+      </div>
+      <div class="portfolio-counter">
+        <span>{{ paintings|length }} Piece{{ paintings|length|pluralize }}</span>
+      </div>
+    </div>
+
+    {% if paintings %}
+      <div class="painting-grid" id="exhibition-painting-grid">
+        {% for painting in paintings %}
+          <article class="painting-card" id="exh-card-{{ painting.pk }}">
+
+            <!-- Arched Picture Frame -->
+            <a href="{% url 'paintings:detail' painting.pk %}"
+               class="card-image-wrap"
+               tabindex="-1"
+               aria-hidden="true">
+              {% if painting.image %}
+                <img src="{{ painting.image.url }}"
+                     alt="{{ painting.title }}"
+                     loading="lazy" />
+              {% else %}
+                <div class="card-placeholder">
+                  <svg width="40" height="40" viewBox="0 0 48 48" fill="none">
+                    <rect x="6" y="6" width="36" height="36" rx="2" stroke="currentColor" stroke-width="1.5"/>
+                    <circle cx="24" cy="21" r="4" stroke="currentColor" stroke-width="1.5"/>
+                    <path d="M11 34 Q17 26 24 28 Q31 30 37 34" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                  </svg>
+                  <span>No Image</span>
+                </div>
+              {% endif %}
+            </a>
+
+            <!-- Card Info -->
+            <div class="card-body">
+              <span class="card-style-badge">{{ painting.style }}</span>
+
+              <h3 class="card-title">
+                <a href="{% url 'paintings:detail' painting.pk %}">{{ painting.title }}</a>
+              </h3>
+
+              <div class="card-meta">
+                <a href="{% url 'artists:detail' painting.artist.pk %}" class="artist-link">
+                  {{ painting.artist.name }}
+                </a>
+                <span class="mono">{{ painting.year_created }}</span>
+                {% if painting.estimated_value %}
+                  <span class="card-value">{{ painting.estimated_value|inr }}</span>
+                {% endif %}
+              </div>
+
+              <div class="card-action-row">
+                <a href="{% url 'paintings:detail' painting.pk %}" class="card-detail-btn">
+                  View Piece & Provenance →
+                </a>
+              </div>
+            </div>
+
+          </article>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <h3>No paintings currently linked to this exhibition</h3>
+        <p>Curatorial works for this presentation are being finalized. Please revisit shortly.</p>
+      </div>
+    {% endif %}
+
+  </section>
+
+{% endblock %}

@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% load currency_tags %}
+
+{% block title %}Order Confirmed — ArtVault{% endblock %}
+{% block meta_description %}Your acquisition of {{ order.painting.title }} is confirmed.{% endblock %}
+
+{% block content %}
+<div class="success-page">
+
+  <!-- Ornament top -->
+  <div class="success-ornament">✦</div>
+
+  <div class="success-card">
+
+    <!-- Painting thumbnail -->
+    <div class="success-image-wrap">
+      {% if order.painting.image %}
+        <img src="{{ order.painting.image.url }}" alt="{{ order.painting.title }}" class="success-painting-img">
+      {% else %}
+        <div class="success-image-placeholder">
+          <svg width="60" height="60" viewBox="0 0 80 80" fill="none">
+            <rect x="8" y="8" width="64" height="64" rx="3" stroke="currentColor" stroke-width="2"/>
+            <circle cx="40" cy="34" r="8" stroke="currentColor" stroke-width="2"/>
+            <path d="M14 60 Q26 44 40 48 Q54 52 66 60" stroke="currentColor" stroke-width="2" fill="none"/>
+          </svg>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Confirmation header -->
+    <div class="success-header">
+      <span class="success-badge">Acquisition Confirmed</span>
+      <h1 class="success-title">{{ order.painting.title }}</h1>
+      <p class="success-artist">by {{ order.painting.artist.name }}</p>
+    </div>
+
+    <!-- Order details table -->
+    <div class="success-details">
+      <div class="success-row">
+        <span class="success-label">Order Reference</span>
+        <span class="success-value mono">#{{ order.pk }}</span>
+      </div>
+      <div class="success-row">
+        <span class="success-label">Payment ID</span>
+        <span class="success-value mono">{{ order.razorpay_payment_id }}</span>
+      </div>
+      <div class="success-row">
+        <span class="success-label">Collector</span>
+        <span class="success-value">{{ order.buyer_name }}</span>
+      </div>
+      <div class="success-row">
+        <span class="success-label">Email</span>
+        <span class="success-value">{{ order.buyer_email }}</span>
+      </div>
+      <div class="success-row success-row--highlight">
+        <span class="success-label">Amount Paid</span>
+        <span class="success-value success-amount">{{ order.amount|inr }}</span>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="success-actions" style="display:flex; justify-content:center; gap:1.2rem; flex-wrap:wrap;">
+      <a href="{% url 'paintings:certificate' order.pk %}" class="btn-acquire" target="_blank" style="padding:0.85rem 2rem; text-decoration:none; display:inline-flex; align-items:center; gap:0.5rem;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/>
+          <line x1="16" y1="17" x2="8" y2="17"/>
+        </svg>
+        <span>Certificate of Authenticity</span>
+      </a>
+      <a href="{% url 'paintings:home' %}" class="btn-back-collection">
+        ← Return to Collection
+      </a>
+    </div>
+
+    <p class="success-footer-note">
+      A confirmation has been recorded for this transaction. Please keep your Payment ID for your records.
+    </p>
+
+  </div>
+
+  <!-- Ornament bottom -->
+  <div class="success-ornament">✦</div>
+</div>
+{% endblock %}

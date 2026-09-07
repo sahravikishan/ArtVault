@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Demo: Midnight Velvet</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Outfit:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #050811; /* Very dark midnight blue */
+      --surface: rgba(15, 23, 42, 0.6); /* Translucent glass */
+      --surface-hover: rgba(25, 35, 60, 0.8);
+      --border: rgba(200, 133, 85, 0.2); /* Faint copper border */
+      --text: #F0F4F8;
+      --copper: #C88555;
+      --copper-glow: rgba(200, 133, 85, 0.4);
+      --muted: #8A9AAB;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: radial-gradient(circle at 50% 0%, #111A30 0%, var(--bg) 100%);
+      color: var(--text);
+      font-family: 'Outfit', sans-serif;
+      padding: 0;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    h1, h2, h3, .logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 600;
+    }
+
+    a { color: var(--copper); text-decoration: none; transition: color 0.3s; }
+    a:hover { color: #fff; }
+
+    /* Header */
+    header {
+      padding: 1.5rem 3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo {
+      font-size: 1.8rem;
+      letter-spacing: 0.05em;
+      color: var(--text);
+    }
+    .logo span { color: var(--copper); font-style: italic; }
+
+    nav a {
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-left: 2rem;
+      color: var(--text);
+    }
+    nav a:hover { color: var(--copper); }
+
+    /* Main */
+    main {
+      padding: 4rem 3rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .page-title {
+      font-size: 3.5rem;
+      margin-bottom: 0.5rem;
+      text-align: center;
+      background: linear-gradient(to right, #fff, var(--copper));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: var(--muted);
+      font-size: 1.1rem;
+      margin-bottom: 4rem;
+      font-style: italic;
+      font-family: 'Cormorant Garamond', serif;
+    }
+
+    /* Grid */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 2.5rem;
+    }
+
+    /* Glassmorphism Card */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      display: flex;
+      flex-direction: column;
+      transition: all 0.4s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-8px);
+      background: var(--surface-hover);
+      border-color: var(--copper);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.8), 0 0 20px var(--copper-glow);
+    }
+
+    .card-img {
+      padding: 1rem;
+    }
+
+    .copper-frame {
+      border-radius: 8px;
+      overflow: hidden;
+      position: relative;
+      aspect-ratio: 4/3;
+    }
+
+    .copper-frame::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border: 1px solid rgba(200, 133, 85, 0.3);
+      border-radius: 8px;
+      pointer-events: none;
+    }
+
+    .copper-frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.6s ease;
+    }
+
+    .card:hover .copper-frame img {
+      transform: scale(1.03);
+    }
+
+    .card-content {
+      padding: 0.5rem 1.5rem 1.5rem;
+      text-align: center;
+    }
+
+    .tag {
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--copper);
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+
+    .card h2 {
+      font-size: 1.5rem;
+      margin-bottom: 0.25rem;
+      line-height: 1.2;
+    }
+
+    .artist {
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin-bottom: 1rem;
+    }
+
+    .price {
+      display: inline-block;
+      border-top: 1px solid var(--border);
+      padding-top: 0.75rem;
+      color: #fff;
+      font-weight: 500;
+      font-size: 1.1rem;
+    }
+
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo">Art<span>Vault</span></div>
+    <nav>
+      <a href="#">Collection</a>
+      <a href="#">Admin</a>
+    </nav>
+  </header>
+
+  <main>
+    <h1 class="page-title">The Evening Sale</h1>
+    <p class="subtitle">A curated collection of masterpieces in the vault.</p>
+    
+    <div class="grid">
+      <!-- Card 1 -->
+      <article class="card">
+        <div class="card-img">
+          <div class="copper-frame">
+            <img src="https://images.unsplash.com/photo-1541961017774-22349e4a1262?auto=format&fit=crop&w=600&q=80" alt="Art">
+          </div>
+        </div>
+        <div class="card-content">
+          <span class="tag">Abstract</span>
+          <h2>Void #7 (The Stillness)</h2>
+          <p class="artist">Hiroshi Tanaka · 2021</p>
+          <div class="price">₹15,000.00</div>
+        </div>
+      </article>
+
+      <!-- Card 2 -->
+      <article class="card">
+        <div class="card-img">
+          <div class="copper-frame">
+            <img src="https://images.unsplash.com/photo-1518998053401-878c735c9032?auto=format&fit=crop&w=600&q=80" alt="Art">
+          </div>
+        </div>
+        <div class="card-content">
+          <span class="tag">Contemporary</span>
+          <h2>Frequencies of Red</h2>
+          <p class="artist">Hiroshi Tanaka · 2019</p>
+          <div class="price">₹12,500.00</div>
+        </div>
+      </article>
+
+      <!-- Card 3 -->
+      <article class="card">
+        <div class="card-img">
+          <div class="copper-frame">
+            <img src="https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=600&q=80" alt="Art">
+          </div>
+        </div>
+        <div class="card-content">
+          <span class="tag">Surrealism</span>
+          <h2>The Ancestor in a Suit</h2>
+          <p class="artist">Amara Osei · 2022</p>
+          <div class="price">₹14,000.00</div>
+        </div>
+      </article>
+    </div>
+  </main>
+
+</body>
+</html>

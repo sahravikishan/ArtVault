@@ -14,25 +14,60 @@
     </div>
     <h1>The Collection</h1>
     <p class="subtitle">A private vault of paintings, each with its own history and story.</p>
+
+    <!-- ── Search Bar ── -->
+    <div class="search-wrap">
+      <form method="get" action="{% url 'paintings:home' %}" class="search-form" role="search">
+        {% if active_style %}
+          <input type="hidden" name="style" value="{{ active_style }}">
+        {% endif %}
+        <div class="search-input-wrap">
+          <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input type="search" name="q" id="search-input"
+                 class="search-input"
+                 placeholder="Search by title, artist, or style…"
+                 value="{{ query|default:'' }}"
+                 autocomplete="off">
+          {% if query %}
+            <a href="{% url 'paintings:home' %}{% if active_style %}?style={{ active_style }}{% endif %}"
+               class="search-clear" title="Clear search" aria-label="Clear search">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"/>
+                <line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </a>
+          {% endif %}
+        </div>
+        <button type="submit" class="btn-search">Search</button>
+      </form>
+    </div>
   </div>
 
   <!-- Style Filter Bar -->
   <nav class="filter-bar" id="filter-bar" aria-label="Filter by style">
     <span class="filter-label">Filter:</span>
 
-    <a href="{% url 'paintings:home' %}"
+    <a href="{% url 'paintings:home' %}{% if query %}?q={{ query }}{% endif %}"
        class="filter-btn {% if not active_style %}active{% endif %}"
        id="filter-all">
       All
     </a>
 
     {% for value, label in style_choices %}
-      <a href="?style={{ value }}"
+      <a href="?style={{ value }}{% if query %}&q={{ query }}{% endif %}"
          class="filter-btn {% if active_style == value %}active{% endif %}"
          id="filter-{{ value|lower }}">
         {{ label }}
       </a>
     {% endfor %}
+
+    <!-- Result count pill -->
+    {% if query or active_style %}
+      <span class="result-count">{{ paintings|length }} result{{ paintings|length|pluralize }}</span>
+    {% endif %}
   </nav>
 
   <!-- Painting Grid -->
@@ -52,17 +87,21 @@
                    loading="lazy" />
             {% else %}
               <div class="card-placeholder">
-                <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-                  <rect x="6" y="6" width="36" height="36" rx="2"
-                        stroke="currentColor" stroke-width="1.5"/>
-                  <rect x="12" y="12" width="24" height="24" rx="1"
-                        stroke="currentColor" stroke-width="1" stroke-dasharray="3 2"/>
-                  <circle cx="24" cy="21" r="4" stroke="currentColor" stroke-width="1.5"/>
-                  <path d="M11 34 Q17 26 24 28 Q31 30 37 34"
-                        stroke="currentColor" stroke-width="1.5" fill="none"/>
-                </svg>
-                <span>No Image</span>
-              </div>
+                  <svg width="40" height="40" viewBox="0 0 48 48" fill="none">
+                    <rect x="6" y="6" width="36" height="36" rx="2"
+                          stroke="currentColor" stroke-width="1.5"/>
+                    <circle cx="24" cy="21" r="4" stroke="currentColor" stroke-width="1.5"/>
+                    <path d="M11 34 Q17 26 24 28 Q31 30 37 34"
+                          stroke="currentColor" stroke-width="1.5" fill="none"/>
+                  </svg>
+                  <span>No Image</span>
+                  {% if user.is_authenticated and user.artist_profile and painting.artist == user.artist_profile %}
+                    <a href="{% url 'artists:painting_edit' painting.pk %}"
+                       class="card-upload-link" title="Edit painting in Artist Studio">
+                      + Edit Canvas
+                    </a>
+                  {% endif %}
+                </div>
             {% endif %}
           </a>
 
@@ -100,11 +139,11 @@
     <div class="empty-state" id="empty-state">
       <h3>No paintings found</h3>
       <p>
-        {% if active_style %}
-          No paintings in the <em>{{ active_style }}</em> style yet.
-          <a href="{% url 'paintings:home' %}">View all.</a>
+        {% if active_style or query %}
+          No paintings found matching your criteria.
+          <a href="{% url 'paintings:home' %}">View the full collection.</a>
         {% else %}
-          Add your first painting via the <a href="/admin/">Admin panel</a>.
+          New master acquisitions are currently being catalogued by the ArtVault curatorial board. Please check back shortly.
         {% endif %}
       </p>
     </div>

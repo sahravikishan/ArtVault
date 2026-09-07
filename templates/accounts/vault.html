@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+{% load currency_tags %}
+
+{% block title %}My Vault — ArtVault{% endblock %}
+
+{% block content %}
+<div class="vault-page">
+
+  <!-- Page header -->
+  <div class="page-header">
+    <h1>My Vault</h1>
+    <p class="subtitle">Welcome back, <em>{{ request.user.first_name|default:request.user.email }}</em></p>
+    {% if request.user.artist_profile %}
+      <div style="margin-top: 1.25rem;">
+        <a href="{% url 'artists:dashboard' %}" class="btn-studio-secondary" style="display:inline-flex; align-items:center; gap:0.45rem; padding: 0.5rem 1.15rem; border: 1px solid var(--gold); border-radius: 2px; text-decoration: none; font-family: 'Cinzel', serif; font-size: 0.75rem; letter-spacing: 0.1em; color: var(--gold); text-transform: uppercase;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/>
+            <circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/>
+            <circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/>
+            <circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/>
+            <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.992 6.012 17.488 2 12 2z"/>
+          </svg>
+          <span>Switch to Artist Studio →</span>
+        </a>
+      </div>
+    {% endif %}
+  </div>
+
+
+
+  <!-- ── Section 1: Saved Works ── -->
+  <section class="vault-section">
+    <div class="vault-section-header">
+      <h2 class="vault-section-title">Saved Works</h2>
+      <span class="vault-count">{{ favourites.count }} piece{{ favourites.count|pluralize }}</span>
+    </div>
+
+    {% if favourites %}
+      <div class="painting-grid">
+        {% for fav in favourites %}
+          <article class="painting-card">
+            <a href="{% url 'paintings:detail' fav.painting.pk %}" class="card-image-wrap">
+              {% if fav.painting.image %}
+                <img src="{{ fav.painting.image.url }}" alt="{{ fav.painting.title }}">
+              {% else %}
+                <div class="card-img-placeholder">
+                  <svg width="48" height="48" viewBox="0 0 80 80" fill="none">
+                    <rect x="8" y="8" width="64" height="64" rx="3" stroke="currentColor" stroke-width="2"/>
+                    <circle cx="40" cy="34" r="8" stroke="currentColor" stroke-width="2"/>
+                    <path d="M14 60 Q26 44 40 48 Q54 52 66 60" stroke="currentColor" stroke-width="2" fill="none"/>
+                  </svg>
+                </div>
+              {% endif %}
+            </a>
+            <div class="card-body">
+              <span class="card-style-badge">{{ fav.painting.style }}</span>
+              <h3 class="card-title">
+                <a href="{% url 'paintings:detail' fav.painting.pk %}">{{ fav.painting.title }}</a>
+              </h3>
+              <div class="card-meta">
+                <a href="{% url 'artists:detail' fav.painting.artist.pk %}" class="artist-link">
+                  {{ fav.painting.artist.name }}
+                </a>
+                <span class="mono">{{ fav.painting.year_created }}</span>
+                {% if fav.painting.estimated_value %}
+                  <span class="card-value">{{ fav.painting.estimated_value|inr }}</span>
+                {% endif %}
+              </div>
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="vault-empty">
+        <p>You have not saved any works yet.</p>
+        <a href="{% url 'paintings:home' %}" class="btn-back-collection">Browse the Collection →</a>
+      </div>
+    {% endif %}
+  </section>
+
+  <!-- ── Section 2: Past Acquisitions ── -->
+  <section class="vault-section">
+    <div class="vault-section-header">
+      <h2 class="vault-section-title">Past Acquisitions</h2>
+      <span class="vault-count">{{ orders.count }} acquisition{{ orders.count|pluralize }}</span>
+    </div>
+
+    {% if orders %}
+      <div class="orders-table-wrap">
+        <table class="orders-table">
+          <thead>
+            <tr>
+              <th>Work</th>
+              <th>Artist</th>
+              <th>Order Ref</th>
+              <th>Amount Paid</th>
+              <th>Date</th>
+              <th>Certificate</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for order in orders %}
+            <tr>
+              <td>
+                <a href="{% url 'paintings:detail' order.painting.pk %}" class="order-title-link">
+                  {{ order.painting.title }}
+                </a>
+              </td>
+              <td class="order-artist">{{ order.painting.artist.name }}</td>
+              <td class="mono order-ref">#{{ order.pk }}</td>
+              <td class="order-amount">{{ order.amount|inr }}</td>
+              <td class="order-date">{{ order.created_at|date:"d M Y" }}</td>
+              <td>
+                <a href="{% url 'paintings:certificate' order.pk %}" target="_blank" class="artist-view-link" title="Download Certificate of Authenticity" style="display:inline-flex; align-items:center; gap:0.35rem;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                    <line x1="16" y1="13" x2="8" y2="13"/>
+                    <line x1="16" y1="17" x2="8" y2="17"/>
+                  </svg>
+                  <span>View COA</span>
+                </a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="vault-empty">
+        <p>No acquisitions yet. When you purchase a work, it will appear here.</p>
+      </div>
+    {% endif %}
+  </section>
+
+</div>
+{% endblock %}

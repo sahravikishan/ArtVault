@@ -1,115 +1,173 @@
 {% extends "base.html" %}
 {% load currency_tags %}
 
-{% block title %}{{ artist.name }} — ArtVault{% endblock %}
-{% block meta_description %}{{ artist.name }}{% if artist.birth_year %}, born {{ artist.birth_year }}{% endif %}. Browse all paintings in the ArtVault collection.{% endblock %}
+{% block title %}{{ artist.name }} — Artist Profile & Portfolio | ArtVault{% endblock %}
+{% block meta_description %}Biographical archive and authenticated portfolio of {{ artist.name }}{% if artist.birth_year %}, born {{ artist.birth_year }}{% endif %}. Explore all catalogued works in the ArtVault collection.{% endblock %}
 
 {% block content %}
 
-  <a href="{% url 'paintings:home' %}" class="back-link" id="back-to-collection">
-    ← Back to Collection
-  </a>
+  <div class="artist-nav-breadcrumbs">
+    <a href="{% url 'artists:list' %}" class="back-link">
+      ← Back to Artists Directory
+    </a>
+    <span class="breadcrumb-separator">/</span>
+    <a href="{% url 'paintings:home' %}" class="back-link">
+      Collection
+    </a>
+  </div>
 
-  <!-- ── Artist Profile Header ── -->
-  <div class="artist-profile-header" id="artist-profile">
-
-    <!-- Photo -->
-    <div class="artist-photo-wrap">
-      {% if artist.photo %}
-        <div class="gold-frame">
-          <!-- Animated border segments -->
-          <span class="frame-v-r" aria-hidden="true"></span>
-          <span class="frame-v-l" aria-hidden="true"></span>
-          <span class="frame-inner" aria-hidden="true"></span>
+  <!-- ── Artist Profile Hero ── -->
+  <section class="artist-profile-hero" id="artist-profile">
+    
+    <!-- Left: Portrait Photo -->
+    <div class="artist-portrait-col">
+      <div class="artist-portrait-frame">
+        {% if artist.photo %}
           <img src="{{ artist.photo.url }}"
                alt="Portrait of {{ artist.name }}"
+               class="artist-portrait-img"
                id="artist-photo" />
-        </div>
-      {% else %}
-        <div class="artist-photo-placeholder" id="artist-photo-placeholder">
-          {{ artist.name|slice:":1" }}
-        </div>
-      {% endif %}
+        {% else %}
+          <div class="artist-monogram-circle" id="artist-photo-placeholder">
+            <span>{{ artist.name|slice:":1" }}</span>
+          </div>
+        {% endif %}
+        <div class="portrait-subtag">Master Artist</div>
+      </div>
     </div>
 
-    <!-- Bio -->
-    <div class="artist-info">
-      <div class="section-label" style="margin-bottom:0.35rem;">
+    <!-- Right: Artist Details & Meta -->
+    <div class="artist-bio-col">
+      
+      <div class="section-label">
         <span class="label-dot"></span>
-        Artist Profile
+        Curated Master Archive
       </div>
 
-      <h1 id="artist-name">{{ artist.name }}</h1>
+      <h1 class="artist-headline" id="artist-name">{{ artist.name }}</h1>
 
-      {% if artist.birth_year %}
-        <p class="artist-born" id="artist-born">b. {{ artist.birth_year }}</p>
-      {% endif %}
+      <div class="artist-meta-tags">
+        {% if artist.birth_year %}
+          <span class="artist-meta-badge">Born {{ artist.birth_year }}</span>
+        {% endif %}
+        {% if earliest_year and latest_year %}
+          <span class="artist-meta-badge">Active {{ earliest_year }}{% if earliest_year != latest_year %} — {{ latest_year }}{% endif %}</span>
+        {% endif %}
+        {% for s in styles %}
+          <span class="artist-style-pill">{{ s }}</span>
+        {% endfor %}
+      </div>
 
-      {% if artist.bio %}
-        <p class="artist-bio" id="artist-bio">{{ artist.bio }}</p>
-      {% endif %}
-    </div>
+      <!-- Quick Stats Panel -->
+      <div class="artist-stats-grid">
+        <div class="artist-stat-box">
+          <span class="stat-number">{{ total_works }}</span>
+          <span class="stat-caption">Works in Vault</span>
+        </div>
+        <div class="artist-stat-box">
+          <span class="stat-number">{{ styles|length }}</span>
+          <span class="stat-caption">Primary Style{{ styles|length|pluralize }}</span>
+        </div>
+        {% if total_value %}
+        <div class="artist-stat-box highlight">
+          <span class="stat-number">{{ total_value|inr }}</span>
+          <span class="stat-caption">Archive Valuation</span>
+        </div>
+        {% endif %}
+      </div>
 
-  </div><!-- /artist-profile-header -->
-
-  <!-- ── Works Section ── -->
-  <h2 class="section-heading" id="paintings-section">
-    Works in the Vault
-  </h2>
-
-  {% if paintings %}
-    <div class="painting-grid" id="artist-painting-grid">
-      {% for painting in paintings %}
-        <article class="painting-card" id="artist-card-{{ painting.pk }}">
-
-          <a href="{% url 'paintings:detail' painting.pk %}"
-             class="card-image-wrap"
-             tabindex="-1"
-             aria-hidden="true">
-            {% if painting.image %}
-              <img src="{{ painting.image.url }}"
-                   alt="{{ painting.title }}"
-                   loading="lazy" />
-            {% else %}
-              <div class="card-placeholder">
-                <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-                  <rect x="6" y="6" width="36" height="36" rx="2"
-                        stroke="currentColor" stroke-width="1.5"/>
-                  <rect x="12" y="12" width="24" height="24" rx="1"
-                        stroke="currentColor" stroke-width="1" stroke-dasharray="3 2"/>
-                  <circle cx="24" cy="21" r="4" stroke="currentColor" stroke-width="1.5"/>
-                  <path d="M11 34 Q17 26 24 28 Q31 30 37 34"
-                        stroke="currentColor" stroke-width="1.5" fill="none"/>
-                </svg>
-                <span>No Image</span>
-              </div>
-            {% endif %}
-          </a>
-
-          <div class="card-body">
-            <span class="card-style-badge">{{ painting.style }}</span>
-
-            <h3 class="card-title">
-              <a href="{% url 'paintings:detail' painting.pk %}">{{ painting.title }}</a>
-            </h3>
-
-            <div class="card-meta">
-              <span class="mono">{{ painting.year_created }}</span>
-              {% if painting.estimated_value %}
-                <span class="card-value">{{ painting.estimated_value|inr }}</span>
-              {% endif %}
-            </div>
+      <!-- Biography -->
+      <div class="artist-biography-text">
+        <h3 class="biography-title">Biography & Artistic Journey</h3>
+        {% if artist.bio %}
+          <div class="biography-paragraphs">
+            <p>{{ artist.bio|linebreaks }}</p>
           </div>
+        {% else %}
+          <p class="biography-empty">Biographical record is being compiled by ArtVault curatorial staff.</p>
+        {% endif %}
+      </div>
 
-        </article>
-      {% endfor %}
     </div>
 
-  {% else %}
-    <div class="empty-state" id="no-paintings-state">
-      <h3>No paintings catalogued yet</h3>
-      <p>Add paintings by {{ artist.name }} via the <a href="/admin/">Admin panel</a>.</p>
+  </section>
+
+  <!-- ── Full Portfolio Exhibition ── -->
+  <section class="artist-portfolio-section">
+    
+    <div class="portfolio-header">
+      <div class="portfolio-header-content">
+        <span class="portfolio-eyebrow">Catalogued Works</span>
+        <h2 class="portfolio-title">The Complete {{ artist.name }} Portfolio</h2>
+        <p class="portfolio-subtitle">All authentic acquisitions, studies, and originals currently conserved in ArtVault.</p>
+      </div>
+      <div class="portfolio-counter">
+        <span>{{ paintings|length }} Masterpiece{{ paintings|length|pluralize }}</span>
+      </div>
     </div>
-  {% endif %}
+
+    {% if paintings %}
+      <div class="painting-grid" id="artist-painting-grid">
+        {% for painting in paintings %}
+          <article class="painting-card" id="artist-card-{{ painting.pk }}">
+
+            <!-- Arched Picture Frame -->
+            <a href="{% url 'paintings:detail' painting.pk %}"
+               class="card-image-wrap"
+               tabindex="-1"
+               aria-hidden="true">
+              {% if painting.image %}
+                <img src="{{ painting.image.url }}"
+                     alt="{{ painting.title }}"
+                     loading="lazy" />
+              {% else %}
+                <div class="card-placeholder">
+                  <svg width="40" height="40" viewBox="0 0 48 48" fill="none">
+                    <rect x="6" y="6" width="36" height="36" rx="2" stroke="currentColor" stroke-width="1.5"/>
+                    <circle cx="24" cy="21" r="4" stroke="currentColor" stroke-width="1.5"/>
+                    <path d="M11 34 Q17 26 24 28 Q31 30 37 34" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                  </svg>
+                  <span>No Image</span>
+                </div>
+              {% endif %}
+            </a>
+
+            <!-- Card Info -->
+            <div class="card-body">
+              <span class="card-style-badge">{{ painting.style }}</span>
+
+              <h3 class="card-title">
+                <a href="{% url 'paintings:detail' painting.pk %}">{{ painting.title }}</a>
+              </h3>
+
+              <div class="card-meta">
+                <span class="mono">{{ painting.year_created }}</span>
+                {% if painting.dimensions %}
+                  <span class="dimensions-note">{{ painting.dimensions }}</span>
+                {% endif %}
+                {% if painting.estimated_value %}
+                  <span class="card-value">{{ painting.estimated_value|inr }}</span>
+                {% endif %}
+              </div>
+
+              <div class="card-action-row">
+                <a href="{% url 'paintings:detail' painting.pk %}" class="card-detail-btn">
+                  View Piece & Provenance →
+                </a>
+              </div>
+            </div>
+
+          </article>
+        {% endfor %}
+      </div>
+
+    {% else %}
+      <div class="empty-state" id="no-paintings-state">
+        <h3>No paintings catalogued yet</h3>
+        <p>Currently no artworks by {{ artist.name }} are publicly on view in the vault. Please check back as new acquisitions are catalogued.</p>
+      </div>
+    {% endif %}
+
+  </section>
 
 {% endblock %}

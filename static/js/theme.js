@@ -56,4 +56,31 @@
       updateLabel();
     });
   });
+
+  // ── Password Visibility Toggles ─────────────────────────────────
+  document.addEventListener('click', function (e) {
+    const toggleBtn = e.target.closest('.field-toggle-pwd');
+    if (!toggleBtn) return;
+    e.preventDefault();
+
+    const targetSel = toggleBtn.getAttribute('data-toggle-target');
+    const wrap = toggleBtn.closest('.input-icon-wrap');
+    const input = targetSel ? document.querySelector(targetSel) : (wrap ? wrap.querySelector('input') : null);
+    if (!input) return;
+
+    const isPassword = input.getAttribute('type') === 'password';
+    input.setAttribute('type', isPassword ? 'text' : 'password');
+
+    const eyeShow = toggleBtn.querySelector('.eye-show');
+    const eyeHide = toggleBtn.querySelector('.eye-hide');
+
+    if (eyeShow && eyeHide) {
+      eyeShow.style.display = isPassword ? 'none' : 'block';
+      eyeHide.style.display = isPassword ? 'block' : 'none';
+    }
+
+    const newLabel = isPassword ? 'Hide password' : 'Show password';
+    toggleBtn.setAttribute('aria-label', newLabel);
+    toggleBtn.setAttribute('title', newLabel);
+  });
 })();

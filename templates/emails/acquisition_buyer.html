@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Acquisition Confirmed — ArtVault</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #F0EBE1;
+      font-family: Georgia, 'Times New Roman', serif;
+      color: #2A231D;
+      padding: 40px 20px;
+    }
+    .wrapper {
+      max-width: 600px;
+      margin: 0 auto;
+      background: #FDFAF5;
+      border: 1px solid #DDD5C5;
+    }
+    /* Header band */
+    .header {
+      background: #2A231D;
+      padding: 32px 40px;
+      text-align: center;
+    }
+    .header-logo {
+      font-size: 11px;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: #B4975A;
+      margin-bottom: 6px;
+    }
+    .header-title {
+      font-size: 28px;
+      color: #F0EBE1;
+      font-weight: normal;
+      letter-spacing: 0.06em;
+    }
+    /* Gold ornament line */
+    .ornament {
+      text-align: center;
+      color: #B4975A;
+      font-size: 18px;
+      letter-spacing: 0.4em;
+      padding: 20px 0;
+      border-bottom: 1px solid #E8E0D0;
+    }
+    /* Body */
+    .body { padding: 40px; }
+    .greeting {
+      font-size: 20px;
+      margin-bottom: 16px;
+    }
+    .intro {
+      font-size: 15px;
+      line-height: 1.7;
+      color: #5A4E45;
+      margin-bottom: 32px;
+    }
+    /* Painting highlight box */
+    .painting-box {
+      border: 1px solid #DDD5C5;
+      padding: 24px;
+      margin-bottom: 32px;
+      background: #FAF7F2;
+      text-align: center;
+    }
+    .painting-label {
+      font-size: 10px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: #B4975A;
+      margin-bottom: 8px;
+    }
+    .painting-title {
+      font-size: 22px;
+      margin-bottom: 4px;
+    }
+    .painting-artist {
+      font-size: 15px;
+      color: #8C847D;
+      font-style: italic;
+    }
+    /* Order details table */
+    .details-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 32px;
+      font-size: 14px;
+    }
+    .details-table th {
+      text-align: left;
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #8C847D;
+      padding: 8px 0;
+      border-bottom: 1px solid #E8E0D0;
+      font-weight: normal;
+    }
+    .details-table td {
+      padding: 12px 0;
+      border-bottom: 1px solid #F0EBE1;
+      vertical-align: top;
+    }
+    .details-table td.label { color: #8C847D; width: 40%; }
+    .details-table td.value { color: #2A231D; font-weight: bold; }
+    .amount-value {
+      font-size: 18px;
+      color: #B4975A;
+    }
+    /* Footer note */
+    .note {
+      font-size: 13px;
+      line-height: 1.6;
+      color: #8C847D;
+      font-style: italic;
+      padding-top: 24px;
+      border-top: 1px solid #E8E0D0;
+    }
+    /* Footer band */
+    .footer {
+      background: #F5F0E8;
+      border-top: 1px solid #DDD5C5;
+      padding: 24px 40px;
+      text-align: center;
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      color: #8C847D;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+
+    <!-- Header -->
+    <div class="header">
+      <p class="header-logo">ArtVault</p>
+      <h1 class="header-title">Acquisition Confirmed</h1>
+    </div>
+
+    <div class="ornament">✦ ✦ ✦</div>
+
+    <!-- Body -->
+    <div class="body">
+
+      <p class="greeting">Dear {{ order.buyer_name }},</p>
+      <p class="intro">
+        Your acquisition has been successfully confirmed and recorded in the ArtVault.
+        We are delighted to welcome this work into your private collection.
+      </p>
+
+      <!-- Painting highlight -->
+      <div class="painting-box">
+        <p class="painting-label">Acquired Work</p>
+        <h2 class="painting-title">{{ order.painting.title }}</h2>
+        <p class="painting-artist">by {{ order.painting.artist.name }}, {{ order.painting.year_created }}</p>
+      </div>
+
+      <!-- Order details -->
+      <table class="details-table">
+        <tr>
+          <th colspan="2">Transaction Details</th>
+        </tr>
+        <tr>
+          <td class="label">Order Reference</td>
+          <td class="value">#{{ order.pk }}</td>
+        </tr>
+        <tr>
+          <td class="label">Payment ID</td>
+          <td class="value" style="font-family: monospace; font-size:12px;">{{ order.razorpay_payment_id }}</td>
+        </tr>
+        <tr>
+          <td class="label">Collector Name</td>
+          <td class="value">{{ order.buyer_name }}</td>
+        </tr>
+        <tr>
+          <td class="label">Email</td>
+          <td class="value">{{ order.buyer_email }}</td>
+        </tr>
+        <tr>
+          <td class="label">Date</td>
+          <td class="value">{{ order.created_at|date:"d F Y, g:i A" }}</td>
+        </tr>
+        <tr>
+          <td class="label">Amount Paid</td>
+          <td class="value"><span class="amount-value">{{ amount_formatted }}</span></td>
+        </tr>
+      </table>
+
+      <p class="note">
+        Please keep your Order Reference and Payment ID for your records.
+        If you have any questions regarding your acquisition, please reply to this email
+        and our team will be happy to assist you.
+      </p>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <p>ArtVault &nbsp;·&nbsp; <span style="color:#B4975A;">Private Collection</span> &nbsp;·&nbsp; All rights reserved</p>
+    </div>
+
+  </div>
+</body>
+</html>

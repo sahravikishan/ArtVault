@@ -5,6 +5,10 @@ import sys
 
 def main():
     """Run administrative tasks."""
+    if hasattr(sys.stdout, 'reconfigure'):
+        sys.stdout.reconfigure(encoding='utf-8')
+    if hasattr(sys.stderr, 'reconfigure'):
+        sys.stderr.reconfigure(encoding='utf-8')
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'artvault_project.settings')
     try:
         from django.core.management import execute_from_command_line

@@ -1,0 +1,23 @@
+New Acquisition Alert — ArtVault
+
+A painting has been acquired through ArtVault.
+
+────────────────────────────────
+PAINTING
+  Title:   {{ order.painting.title }}
+  Artist:  {{ order.painting.artist.name }}
+  Year:    {{ order.painting.year_created }}
+
+BUYER
+  Name:    {{ order.buyer_name }}
+  Email:   {{ order.buyer_email }}
+  Phone:   {{ order.buyer_phone }}
+
+TRANSACTION
+  Order #:     {{ order.pk }}
+  Razorpay ID: {{ order.razorpay_payment_id }}
+  Amount:      {{ amount_formatted }}
+  Date:        {{ order.created_at|date:"d F Y, g:i A" }}
+────────────────────────────────
+
+Manage orders: http://127.0.0.1:8000/admin/paintings/order/

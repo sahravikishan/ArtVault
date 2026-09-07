@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}Confirm Deletion — ArtVault{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+  <div class="auth-card" style="text-align: center;">
+
+    <div class="auth-header">
+      <span class="auth-eyebrow text-danger">Artwork Removal</span>
+      <h1 class="auth-title">Remove Listing?</h1>
+      <p class="auth-subtitle">Are you certain you wish to withdraw this artwork from the ArtVault collection?</p>
+    </div>
+
+    <div style="margin: 2rem 0; padding: 1.5rem; background: var(--bg); border: 1px solid var(--border);">
+      <h3 style="font-family:'Cinzel',serif; font-size:1.3rem; margin-bottom: 0.35rem;">{{ painting.title }}</h3>
+      <p class="studio-muted">{{ painting.style }} &bull; {{ painting.year_created }}</p>
+    </div>
+
+    <form method="post" style="display: flex; gap: 1rem; justify-content: center;">
+      {% csrf_token %}
+      <button type="submit" class="btn-auth text-danger" style="background: rgba(198,40,40,0.1); border-color: #c62828; color: #c62828; width: auto; padding: 0.8rem 2rem;">
+        Confirm &amp; Delete
+      </button>
+      <a href="{% url 'artists:dashboard' %}" class="btn-studio-secondary" style="text-decoration: none; padding: 0.8rem 2rem;">
+        Cancel
+      </a>
+    </form>
+
+  </div>
+</div>
+{% endblock %}
