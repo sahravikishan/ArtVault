@@ -95,7 +95,7 @@
     </div>
 
     {% if paintings %}
-      <div class="painting-grid" id="exhibition-painting-grid">
+      <div class="painting-grid{% if paintings|length == 1 %} grid-single{% elif paintings|length == 2 %} grid-double{% endif %}" id="exhibition-painting-grid">
         {% for painting in paintings %}
           <article class="painting-card" id="exh-card-{{ painting.pk }}">
 

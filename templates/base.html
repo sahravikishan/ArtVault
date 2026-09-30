@@ -44,7 +44,7 @@
         <!-- Auth links -->
         {% if user.is_authenticated %}
           {% if user.artist_profile and user.collector_profile %}
-            <a href="{% url 'artists:dashboard' %}" class="header-curator-portal-link" style="border-color: #d4af37; color: #d4af37; display: inline-flex; align-items: center; gap: 0.4rem;">
+            <a href="{% url 'artists:dashboard' %}" class="header-curator-portal-link">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/>
                 <circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/>
@@ -56,7 +56,7 @@
             </a>
             <a href="{% url 'accounts:vault' %}" class="header-auth-link">My Vault</a>
           {% elif user.artist_profile %}
-            <a href="{% url 'artists:dashboard' %}" class="header-curator-portal-link" style="border-color: #d4af37; color: #d4af37; display: inline-flex; align-items: center; gap: 0.4rem;">
+            <a href="{% url 'artists:dashboard' %}" class="header-curator-portal-link">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/>
                 <circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/>

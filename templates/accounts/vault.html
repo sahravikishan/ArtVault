@@ -36,7 +36,7 @@
     </div>
 
     {% if favourites %}
-      <div class="painting-grid">
+      <div class="painting-grid{% if favourites.count == 1 %} grid-single{% elif favourites.count == 2 %} grid-double{% endif %}">
         {% for fav in favourites %}
           <article class="painting-card">
             <a href="{% url 'paintings:detail' fav.painting.pk %}" class="card-image-wrap">
