@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="plumGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3B171D"/>
+      <stop offset="100%" stop-color="#240E13"/>
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E8CA85"/>
+      <stop offset="50%" stop-color="#C5A55F"/>
+      <stop offset="100%" stop-color="#9E7B35"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Deep Plum Luxury Medallion Base -->
+  <circle cx="32" cy="32" r="30" fill="url(#plumGrad)" stroke="url(#goldGrad)" stroke-width="2"/>
+  
+  <!-- Fine Inner Concentric Accent Ring -->
+  <circle cx="32" cy="32" r="26.5" fill="none" stroke="url(#goldGrad)" stroke-width="0.75" stroke-dasharray="1.5 1.5" opacity="0.6"/>
+
+  <!-- Architectural Vault Arch Silhouette -->
+  <path d="M 20 46 V 28 A 12 12 0 0 1 44 28 V 46" fill="none" stroke="url(#goldGrad)" stroke-width="1.2" opacity="0.45"/>
+
+  <!-- Classical Roman Serif Monogram 'A' -->
+  <path d="M 29.5 14.5 H 34.5 L 47 45 C 47.7 46.6 48.6 47 49.8 47 H 50.5 V 48.5 H 39 V 47 H 40.2 C 41.6 47 42 46.3 41.4 45 L 38.3 37 H 24.7 L 22.1 44.2 C 21.5 45.9 21.9 47 23.4 47 H 24.5 V 48.5 H 13.5 V 47 H 14.5 C 16 47 17 46.3 17.7 44.2 Z M 31.8 19.5 L 25.8 34.2 H 37.2 Z" fill="url(#goldGrad)"/>
+</svg>
