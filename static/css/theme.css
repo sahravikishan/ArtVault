@@ -195,26 +195,19 @@ img { max-width: 100%; display: block; }
 }
 
 .logo-mark {
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
-  border: 1px solid var(--plum);
-  background: var(--plum);
-  color: #F8F4EB;
-  font-family: 'Cinzel', serif;
-  font-size: 0.95rem;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  letter-spacing: 0;
-  transition: var(--transition);
+  display: block;
+  flex-shrink: 0;
+  object-fit: contain;
+  transition: transform var(--transition), box-shadow var(--transition);
+  box-shadow: 0 2px 8px rgba(35, 17, 22, 0.16);
 }
 
 .site-logo:hover .logo-mark {
-  background: var(--gold);
-  color: #FFFDF9;
-  border-color: var(--gold);
+  transform: rotate(8deg) scale(1.06);
+  box-shadow: 0 4px 14px rgba(197, 165, 95, 0.35);
 }
 
 .logo-text {
@@ -3382,15 +3375,11 @@ body.dark .site-header {
 }
 
 body.dark .site-logo .logo-mark {
-  border-color: #5B4D47;
-  background: rgba(59, 23, 29, 0.5);
-  color: #C7A66A;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
 }
 
 body.dark .site-logo:hover .logo-mark {
-  background: #C7A66A;
-  color: #1B1113;
-  border-color: #C7A66A;
+  box-shadow: 0 4px 16px rgba(199, 166, 106, 0.45);
 }
 
 body.dark .logo-text {
